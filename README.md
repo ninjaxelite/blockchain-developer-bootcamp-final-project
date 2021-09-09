@@ -1,6 +1,6 @@
 ### blockchain-developer-bootcamp-final-project
 
-Every time you want to obtain crypto currencies you have to make an account on an exchange and do all the required KYC which may take mupltiple hours and in some cases even days until its fully active. With CrypToToCash you can simply choose an offering and handle the transaction privatly without any KYC steps.
+Every time you want to obtain crypto currencies you have to make an account on an exchange and do all the required KYC which may take mupltiple hours and in some cases even days until its fully active. With CryptoToCash you can simply choose an offering and handle the transaction privatly without any KYC steps.
 
 ### CryptoToCash (ODEX - Offline Decentralized Exchange)
 
