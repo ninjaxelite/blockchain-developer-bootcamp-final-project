@@ -43,12 +43,12 @@ library DPoolUtil {
             _startTime
         );
         require(substracted, "stopTime is greater than startTime");
-        require(duration > 0, "division by 'zero' may occure");
 
         (bool divided, uint256 _ratePerSecond) = SafeMath.tryDiv(
             _deposit,
             duration
         );
+        require(divided, "division by 'zero' may have occured");
 
         return _ratePerSecond;
     }
@@ -64,5 +64,13 @@ library DPoolUtil {
             "recipient should not be this contract"
         );
         require(recipient != sender, "recipient should not be sender");
+    }
+
+    function isContract(address _addr) internal view returns (bool) {
+        uint32 size;
+        assembly {
+            size := extcodesize(_addr)
+        }
+        return (size > 0);
     }
 }

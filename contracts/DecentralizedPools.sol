@@ -8,11 +8,16 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./Stream.sol";
 import "./utils/DPoolUtil.sol";
 
+/*
+ * Extended Streaming protocol
+ */
 contract DecentralizedPools {
+    // --
+
     // contract owner
     address owner;
 
-    event CreatePool(
+    event CreateDPool(
         uint256 dpId,
         address sender,
         address[] recipients,
@@ -20,6 +25,21 @@ contract DecentralizedPools {
         address tokenAddress,
         uint256 startTime,
         uint256 stopTime
+    );
+
+    event WithdrawFromDPool(
+        uint256 dpId,
+        address receiver,
+        uint256 amount,
+        uint256 remainingBalance
+    );
+
+    event DeleteDPool(
+        uint256 dpId,
+        address sender,
+        address[] recipients,
+        uint256 dPoolBalance,
+        uint256 recipientBalances
     );
 
     // different pools by their ids
@@ -167,16 +187,14 @@ contract DecentralizedPools {
             tokenAddress: _tokenAddress,
             dsType: _type,
             startTime: _startTime,
-            stopTime: _stopTime
+            stopTime: _stopTime,
+            isCreated: true
         });
         dPools[dPoolIdCounter] = dPool;
 
-        if (msg.value > 0) {
-            transferEther();
-        } else if (msg.value == 0) {
-            transferTokens(_tokenAddress, _deposit);
-        }
-        emit CreatePool(
+        transfer(dPool.tokenAddress, dPool.deposit, msg.value);
+
+        emit CreateDPool(
             dPoolIdCounter,
             msg.sender,
             _recipients,
@@ -209,11 +227,29 @@ contract DecentralizedPools {
     }
 
     // transfers ether to contract
-    function transferEther() public payable {
-        (bool sent, bytes memory data) = address(this).call{value: msg.value}(
-            ""
-        );
+    function transferEther(uint256 amount) public payable {
+        (bool sent, bytes memory data) = address(this).call{value: amount}("");
         require(sent, "ether could not be sent");
+    }
+
+    // transfer either tokens or ether
+    function transfer(
+        address tokenAddress,
+        uint256 tokenAmount,
+        uint256 ethAmount
+    ) internal {
+        if (DPoolUtil.isContract(tokenAddress)) {
+            transferTokens(tokenAddress, tokenAmount);
+        } else if (tokenAddress == address(0x0)) {
+            transferEther(ethAmount);
+        }
+    }
+
+    function transferEachRecipientBalance(
+        address tokenAddress,
+        address[] memory recipients
+    ) internal returns (uint256) {
+        // -----####
     }
 
     /*
@@ -223,12 +259,11 @@ contract DecentralizedPools {
      * @param recipientSize - the size/length of existing recipients in dPool
      * @returns balance - of the recipient or the sender/creator of dPool
      */
-    function balanceOf(
-        uint256 dpId,
-        address requester,
-        uint256 recipientSize
-    ) public view returns (uint256) {
-        Stream.DPool memory dPool = dPools[dpId];
+    function balanceOf(Stream.DPool memory dPool, address requester)
+        public
+        view
+        returns (uint256)
+    {
         uint256 delta = DPoolUtil.deltaOf(dPool);
 
         (bool totalResult, uint256 totalRecipientBalance) = SafeMath.tryMul(
@@ -238,7 +273,7 @@ contract DecentralizedPools {
         require(totalResult);
         (bool currentResult, uint256 currentRecipientBalance) = SafeMath.tryDiv(
             totalRecipientBalance,
-            recipientSize
+            dPool.recipients.length
         );
         require(currentResult);
 
@@ -258,16 +293,100 @@ contract DecentralizedPools {
         return 0;
     }
 
-    function withdrawFromDPool(
-        uint256 dpId,
-        address requester,
-        address tokenAddress,
-        uint256 amount
-    ) public payable {
+    /*
+     * @notice Sender will receive requested amount, if the registered address is in dPool
+     *  and remaingBalance of dPool is greater zero.
+     * @param dpId - identification of dPool
+     * @param amount - requested from sender
+     * @returns true - if function executes fantastically
+     */
+    function withdrawFromDPool(uint256 dpId, uint256 amount)
+        public
+        payable
+        returns (bool)
+    {
+        /* To safe transaction cost some call constraints are deliberately inside the function 
+            and not in modifiers.
+        */
+        require(amount > 0, "amount is zero");
         Stream.DPool memory dPool = dPools[dpId];
+        require(dPool.isCreated, "DPool does not exist");
         require(dPool.remainingBalance > 0, "no remaining balance in dPool");
+        require(
+            msg.sender == dPool.sender || recipientsByDPoolId[msg.sender][dpId],
+            "recipient is not registered in dPool"
+        );
 
-        uint256 cBalance = balanceOf(dpId, requester, dPool.recipients.length);
+        uint256 cBalance = balanceOf(dPool, msg.sender);
+        require(cBalance >= amount, "no balance left for requester");
+
+        (bool result, uint256 newVal) = SafeMath.trySub(
+            dPool.remainingBalance,
+            amount
+        );
+        require(result, "remainging balance calculation failed");
+
+        if (dPool.remainingBalance == 0) {
+            delete dPools[dpId];
+            delete recipientsByDPoolId[msg.sender][dpId];
+        }
+
+        transfer(dPool.tokenAddress, amount, amount);
+
+        emit WithdrawFromDPool(
+            dpId,
+            msg.sender,
+            amount,
+            dPool.remainingBalance
+        );
+
+        return true;
+    }
+
+    function deleteDPool(uint256 dpId) external returns (bool) {
+        Stream.DPool memory dPool = dPools[dpId];
+        require(dPool.isCreated, "DPool does not exist");
+        require(
+            msg.sender == dPool.sender || recipientsByDPoolId[msg.sender][dpId],
+            "deletion of dPool is not allowed"
+        );
+
+        uint256 dPoolBalance = balanceOf(dPool, dPool.sender);
+
+        if (dPoolBalance > 0) {
+            transfer(dPool.tokenAddress, dPoolBalance, dPoolBalance);
+        }
+
+        uint256 recipientBalances = transferEachRecipientBalance(
+            dPool.tokenAddress,
+            dPool.recipients
+        );
+
+        delete dPools[dpId];
+        delete recipientsByDPoolId[msg.sender][dpId];
+
+        emit DeleteDPool(
+            dpId,
+            dPool.sender,
+            dPool.recipients,
+            dPoolBalance,
+            recipientBalances
+        );
+    }
+
+    function deleteRecipientFromDPool(uint256 dpId, address recipient)
+        external
+        returns (bool)
+    {
+        Stream.DPool memory dPool = dPools[dpId];
+        require(dPool.isCreated, "DPool does not exist");
+        require(
+            recipientsByDPoolId[msg.sender][dpId],
+            "deletion of dPool is not allowed"
+        );
+
+        uint256 dPoolBalance = balanceOf(dPool, dPool.sender);
+        transfer(dPool.tokenAddress, dPoolBalance, dPoolBalance);
     }
 
     fallback() external payable {}

@@ -20,5 +20,6 @@ contract Stream {
         DSType dsType;
         uint256 startTime;
         uint256 stopTime;
+        bool isCreated;
     }
 }
