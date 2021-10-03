@@ -1,0 +1,17 @@
+{
+    "name": "odex",
+    "version": "1.0.0",
+    "description": "ODEX - Trade",
+    "main": "index.js",
+    "scripts": {
+        "compile": "truffle compile",
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start-debugger": "truffle run debug start"
+    },
+    "author": "Magomed Arsaev",
+    "license": "ISC",
+    "dependencies": {
+        "@openzeppelin/contracts": "^4.3.2",
+        "truffle-plugin-debugger": "0.0.2"
+    }
+}

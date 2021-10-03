@@ -1,0 +1,5 @@
+# untrack folders
+node_modules/
+build/
+.vscode/
+.secret
