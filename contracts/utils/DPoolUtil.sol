@@ -36,13 +36,16 @@ library DPoolUtil {
     function calculateRPS(
         uint256 _deposit,
         uint256 _startTime,
-        uint256 _stopTime
+        uint256 _stopTime,
+        uint256 _type
     ) internal pure returns (uint256) {
         (bool substracted, uint256 duration) = SafeMath.trySub(
             _stopTime,
             _startTime
         );
         require(substracted, "stopTime is greater than startTime");
+
+        require(_deposit > duration, "deposit must be greater than duration");
 
         (bool divided, uint256 _ratePerSecond) = SafeMath.tryDiv(
             _deposit,
@@ -64,13 +67,5 @@ library DPoolUtil {
             "recipient should not be this contract"
         );
         require(recipient != sender, "recipient should not be sender");
-    }
-
-    function isContract(address _addr) internal view returns (bool) {
-        uint32 size;
-        assembly {
-            size := extcodesize(_addr)
-        }
-        return (size > 0);
     }
 }
