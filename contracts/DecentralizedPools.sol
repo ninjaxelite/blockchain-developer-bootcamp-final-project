@@ -212,8 +212,7 @@ contract DecentralizedPools {
         uint256 _ratePerSecond = DPoolUtil.calculateRPS(
             _deposit,
             _startTime,
-            _stopTime,
-            _type
+            _stopTime
         );
 
         Stream.DPool memory dPool = Stream.DPool({
@@ -231,7 +230,7 @@ contract DecentralizedPools {
         });
         dPools[dPoolIdCounter] = dPool;
 
-        transfer(_tokenAddress, _type, _deposit, msg.value);
+        transferToContract(_tokenAddress, _type, _deposit, msg.value);
 
         emit CreateDPool(
             dPoolIdCounter,
@@ -255,35 +254,61 @@ contract DecentralizedPools {
     }
 
     // transfers tokens to contract
-    function transferTokens(address tokenAddress, uint256 amount)
-        public
-        payable
-    {
+    function transferTokens(
+        address fromSender,
+        address toAddress,
+        address tokenAddress,
+        uint256 amount
+    ) public payable {
         bool sent = IERC20(tokenAddress).transferFrom(
-            msg.sender,
-            address(this),
+            fromSender,
+            toAddress,
             amount
         );
         require(sent, "tokens could not be sent");
     }
 
     // transfers ether to contract
-    function transferEther(uint256 amount) public payable {
-        (bool sent, bytes memory data) = address(this).call{value: amount}("");
+    function transferEther(address requester, uint256 amount) public payable {
+        (bool sent, bytes memory data) = requester.call{value: amount}("");
         require(sent, "ether could not be sent");
     }
 
-    // transfer either tokens or ether
-    function transfer(
+    // transfer tokens or ether
+    function transferToContract(
         address tokenAddress,
         uint256 dVType,
         uint256 tokenAmount,
         uint256 ethAmount
     ) internal {
         if (uint256(Stream.DValueType.TOKEN) == dVType) {
-            transferTokens(tokenAddress, tokenAmount);
+            transferTokens(
+                msg.sender,
+                address(this),
+                tokenAddress,
+                tokenAmount
+            );
         } else if (tokenAddress == address(0x0)) {
-            transferEther(ethAmount);
+            transferEther(address(this), ethAmount);
+        }
+    }
+
+    // withdraw tokens or ether
+    function withdrawFromContract(
+        address tokenAddress,
+        uint256 dVType,
+        uint256 tokenAmount,
+        uint256 ethAmount
+    ) internal {
+        if (uint256(Stream.DValueType.TOKEN) == dVType) {
+            transferTokens(
+                address(this),
+                msg.sender,
+                tokenAddress,
+                tokenAmount
+            );
+        } else if (tokenAddress == address(0x0)) {
+            transferEther(msg.sender, ethAmount);
         }
     }
 
@@ -307,17 +332,9 @@ contract DecentralizedPools {
             dPool.ratePerSecond
         );
         require(totalResult, "delta * rate issue");
-        require(
-            totalRecipientBalance > 0,
-            "balanceOf totalRecipientBalance is zero"
-        );
 
-        (bool currentResult, uint256 individualRecipientBalance) = SafeMath
-            .tryDiv(totalRecipientBalance, dPool.recipients.length);
-        require(currentResult, "balanceOf division not possible");
-
-        if (recipientsByDPoolId[requester][dPool.dPoolId]) {
-            return individualRecipientBalance;
+        if (totalRecipientBalance == 0) {
+            return 0;
         }
 
         if (requester == dPool.creator) {
@@ -330,8 +347,18 @@ contract DecentralizedPools {
             return senderBalance;
         }
 
+        (bool currentResult, uint256 individualRecipientBalance) = SafeMath
+            .tryDiv(totalRecipientBalance, dPool.recipients.length);
+        require(currentResult, "balanceOf division not possible");
+
+        if (recipientsByDPoolId[requester][dPool.dPoolId]) {
+            return individualRecipientBalance;
+        }
+
         return 0;
     }
+
+    event Logger(string txt, address sender, address spender, uint256 l);
 
     /*
      * @notice Sender will receive requested amount, if the registered address is in dPool
@@ -358,7 +385,16 @@ contract DecentralizedPools {
             "recipient is not registered in dPool"
         );
 
+        uint256 amt = IERC20(dPool.tokenAddress).allowance(
+            address(this),
+            msg.sender
+        );
+        emit Logger("allowance to send tokens", address(this), msg.sender, amt);
+        if (amount > 0) {
+            return false;
+        }
         uint256 cBalance = balanceOf(dpId, msg.sender);
+
         require(cBalance >= amount, "requested higher amount than remains");
 
         (bool result, uint256 newRemainingBalance) = SafeMath.trySub(
@@ -369,7 +405,7 @@ contract DecentralizedPools {
 
         dPool.remainingBalance = newRemainingBalance;
 
-        transfer(dPool.tokenAddress, dPool.dVType, amount, amount);
+        withdrawFromContract(dPool.tokenAddress, dPool.dVType, amount, amount);
 
         if (dPool.remainingBalance == 0) {
             delete dPools[dpId];
@@ -401,7 +437,7 @@ contract DecentralizedPools {
         uint256 dPoolBalance = balanceOf(dpId, dPool.creator);
 
         if (dPoolBalance > 0) {
-            transfer(
+            withdrawFromContract(
                 dPool.tokenAddress,
                 dPool.dVType,
                 dPoolBalance,
@@ -431,7 +467,12 @@ contract DecentralizedPools {
         );
 
         uint256 dPoolBalance = balanceOf(dpId, recipient);
-        transfer(dPool.tokenAddress, dPool.dVType, dPoolBalance, dPoolBalance);
+        withdrawFromContract(
+            dPool.tokenAddress,
+            dPool.dVType,
+            dPoolBalance,
+            dPoolBalance
+        );
 
         emit DeleteRecipientsFromDPool(
             dpId,
@@ -451,7 +492,7 @@ contract DecentralizedPools {
             );
 
             if (recipientBalance > 0) {
-                transfer(
+                withdrawFromContract(
                     dPool.tokenAddress,
                     dPool.dVType,
                     recipientBalance,

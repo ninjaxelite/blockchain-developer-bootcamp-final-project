@@ -1,0 +1,51 @@
+<!-- Toolbar -->
+<div>
+  <app-toolbar></app-toolbar>
+</div>
+
+<div class="center">
+  <span class="metamask-missing center" *ngIf="!selectedAccount">Please install
+    <img class="metamask-icon" src="assets/metamask.png" />
+    MetaMask and switch to Kovan or Rinkeby
+    Test-Network. After that refresh this page.</span>
+
+  <div class="center" *ngIf="selectedAccount" style="margin-top: 5px;">
+    <svg width="55" [data-jdenticon-value]="jdValue"></svg>
+  </div>
+  <span *ngIf="selectedAccount" style="font-size: 17px;">
+    <strong>{{selectedAccount}}</strong>
+  </span>
+
+  <div class="center" *ngIf="!selectedAccount">
+    <button #metamask mat-raised-button [disabled]="disableStartAppBtn" class="start-app center"
+      (click)="startApp()">Start Applikation</button>
+    <br />
+    <label *ngIf="metamask.disabled">Complete the verification process with MetaMask.</label>
+  </div>
+
+  <span *ngIf="loading" class="center" style="font-size: 40px;"><strong>Loading...</strong></span>
+
+  <div *ngIf="!loading">
+    <button mat-raised-button class="start-app" (click)="startApp()">Create
+      Pool</button>
+
+    <div class="">
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Footer -->
+<footer>
+  <div class="footer">
+    <p class="center">Do you like Decentralized Pools and want to contribute with new ideas?</p>
+    <p class="center">Contact me on Instagram
+      <img class="metamask-icon" style="margin-right: 3px;" src="assets/insta.png" />
+      <strong>crypto.maga</strong>.
+    </p>
+  </div>
+</footer>
+
+<router-outlet></router-outlet>

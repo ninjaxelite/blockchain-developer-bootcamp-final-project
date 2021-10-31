@@ -36,8 +36,7 @@ library DPoolUtil {
     function calculateRPS(
         uint256 _deposit,
         uint256 _startTime,
-        uint256 _stopTime,
-        uint256 _type
+        uint256 _stopTime
     ) internal pure returns (uint256) {
         (bool substracted, uint256 duration) = SafeMath.trySub(
             _stopTime,
