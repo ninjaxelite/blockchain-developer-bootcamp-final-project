@@ -1,0 +1,50 @@
+<div class="card dpool">
+    <div class="dpool-header">
+        <svg width="55" class="center" [data-jdenticon-value]="jdValue"></svg>
+    </div>
+    <div class="card-details center" style="padding: 10px;">
+        <table cellspacing="0" cellpadding="0">
+            <tr>
+                <td>Name</td>
+                <td><span>{{dPool.dPoolName}}</span></td>
+            </tr>
+            <tr>
+                <td>Creator</td>
+                <td><button mat-button class="address"
+                        (click)="dPoolService.copyToCB(dPool.creator)">{{dPool.creator}}</button></td>
+            </tr>
+            <tr>
+                <td>Recipients</td>
+                <td>
+                    <div>
+                        <button id="matRbtn{{dPool.dPoolId}}" mat-button class="address" style="margin-right: 5px;"
+                            [matMenuTriggerFor]="menu"
+                            (click)="dPoolService.copyToCB(dPool.recipients[0])">{{dPool.recipients[0]}}</button>
+                        <mat-menu #menu="matMenu">
+                            <button *ngFor="let r of dPool.recipients" mat-menu-item
+                                (click)="dPoolService.copyToCB(r)">{{r}}</button>
+                        </mat-menu>
+                        <button mat-button (click)="arrow('matRbtn' + dPool.dPoolId)" class="arrow">⇩</button>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding-top: 3px;">Deposit</td>
+                <td style="padding-top: 3px;"><span>{{dPool.deposit}}</span></td>
+            </tr>
+            <tr>
+                <td style="padding-top: 5px;">Remaining</td>
+                <td style="padding-top: 5px;"><span>{{dPool.remainingBalance}}</span></td>
+            </tr>
+            <tr>
+                <td style="padding-top: 5px;">Start time</td>
+                <td style="padding-top: 5px;"><span>{{startTime}}</span></td>
+            </tr>
+            <tr>
+                <td style="padding-top: 5px;">Stop time</td>
+                <td style="padding-top: 5px;"><span>{{stopTime}}</span></td>
+            </tr>
+        </table>
+        <div style="padding-top: 10px;">Value is distributed in <strong>ETH</strong></div>
+    </div>
+</div>

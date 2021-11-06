@@ -53,6 +53,9 @@ contract DecentralizedPools {
     // different pools by their ids
     mapping(uint256 => Stream.DPool) dPools;
 
+    // get all pool ids by creator
+    mapping(address => uint256[]) dPoolIdsByCreator;
+
     // every recipient address by dPoolId
     mapping(address => mapping(uint256 => bool)) recipientsByDPoolId;
 
@@ -229,6 +232,8 @@ contract DecentralizedPools {
             isCreated: true
         });
         dPools[dPoolIdCounter] = dPool;
+        uint256[] storage creatorPoolIds = dPoolIdsByCreator[msg.sender];
+        creatorPoolIds.push(dPoolIdCounter);
 
         transferToContract(_tokenAddress, _type, _deposit, msg.value);
 
@@ -447,6 +452,13 @@ contract DecentralizedPools {
 
         transferRecipientBalances(dPool);
 
+        // TODO delete creator pool id !!!!
+
+        uint256[] storage creatorPoolIds = dPoolIdsByCreator[msg.sender];
+
+        if (creatorPoolIds.length == 0) {
+            delete dPoolIdsByCreator[msg.sender];
+        }
         delete dPools[dpId];
         delete recipientsByDPoolId[msg.sender][dpId];
 

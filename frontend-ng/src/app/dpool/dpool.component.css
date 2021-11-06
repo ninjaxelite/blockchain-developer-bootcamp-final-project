@@ -1,0 +1,40 @@
+.center {
+    margin: 0 auto;
+    display: table;
+}
+
+.dpool {
+    border: 2px solid rgb(139, 118, 118);
+    border-radius: 20px;
+}
+
+.dpool-header {
+    background-color: #6eaad1;
+    border-top-left-radius: 18px;
+    border-top-right-radius: 18px;
+    padding: 7px 0 7px 0;
+}
+
+.card-details {
+    font-size: 17px;
+}
+.card-details span {
+    font-weight: 500;
+    padding-left: 15px;;
+}
+
+table, tr, td {
+    border: none;
+}
+
+.address {
+    padding-right: 0;
+    padding-left: 0;
+    margin-left: 15px;
+    height: 24px;
+    bottom: 4px;
+}
+
+.arrow {
+    background-color: #d5cfcf;font-size:23px;line-height: 15px;bottom:4px;padding:3px;margin:0;min-width:10px;
+}

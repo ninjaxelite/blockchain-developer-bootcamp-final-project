@@ -8,11 +8,20 @@ import { MatMenuModule } from '@angular/material/menu';
 import { ToolbarComponent } from './toolbar/toolbar.component';
 import { MatButtonModule } from '@angular/material/button';
 import { NgxJdenticonModule } from "ngx-jdenticon";
+import { DpoolComponent } from './dpool/dpool.component';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatInputModule } from '@angular/material/input';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatMomentDateModule } from '@angular/material-moment-adapter';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { SnackbarComponent } from './snackbar/snackbar.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ToolbarComponent,
+    DpoolComponent,
+    SnackbarComponent,
   ],
   imports: [
     BrowserModule,
@@ -20,7 +29,13 @@ import { NgxJdenticonModule } from "ngx-jdenticon";
     BrowserAnimationsModule,
     MatMenuModule,
     MatButtonModule,
-    NgxJdenticonModule
+    NgxJdenticonModule,
+    MatDividerModule,
+    MatInputModule,
+    MatDatepickerModule,
+    MatMomentDateModule,
+    FormsModule,
+    ReactiveFormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
