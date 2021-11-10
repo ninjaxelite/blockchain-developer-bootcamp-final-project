@@ -3,7 +3,8 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  dPoolContract: '0x26aFF8e95d90282Fe9c4D06256086E1098488701'
 };
 
 /*

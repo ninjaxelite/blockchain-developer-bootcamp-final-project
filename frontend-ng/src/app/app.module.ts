@@ -15,6 +15,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatMomentDateModule } from '@angular/material-moment-adapter';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SnackbarComponent } from './snackbar/snackbar.component';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -35,7 +36,8 @@ import { SnackbarComponent } from './snackbar/snackbar.component';
     MatDatepickerModule,
     MatMomentDateModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]

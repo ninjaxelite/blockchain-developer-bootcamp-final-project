@@ -4,10 +4,12 @@ export class DPool {
     creator: string;
     recipients: string[];
     deposit: number;
+    depositDevaluated: number;
     remainingBalance: number;
+    remainingBalanceDevaluated: number;
     token: string;
     startTime: number;
     stopTime: number;
-    status: string;
+    type: string;
 }
 

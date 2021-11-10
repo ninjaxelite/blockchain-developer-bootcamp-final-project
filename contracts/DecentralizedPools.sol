@@ -22,7 +22,6 @@ contract DecentralizedPools {
         address sender,
         address[] recipients,
         uint256 deposit,
-        uint256 ratePerSecond,
         address tokenAddress,
         uint256 startTime,
         uint256 stopTime,
@@ -108,11 +107,17 @@ contract DecentralizedPools {
         owner = msg.sender;
     }
 
-    function getDPool(uint256 dpId)
+    function getDPoolsCount() public view returns (uint256) {
+        uint256[] memory _dPoolIds = dPoolIdsByCreator[msg.sender];
+        return _dPoolIds.length;
+    }
+
+    function getDPool(uint256 index)
         public
         view
         returns (
             uint256,
+            string memory,
             address,
             address[] memory,
             uint256,
@@ -125,19 +130,21 @@ contract DecentralizedPools {
             uint256
         )
     {
-        Stream.DPool memory dPool = dPools[dpId];
+        uint256 dPoolId = dPoolIdsByCreator[msg.sender][index];
+        Stream.DPool memory _dPool = dPools[dPoolId];
         return (
-            dPool.dPoolId,
-            dPool.creator,
-            dPool.recipients,
-            dPool.deposit,
-            dPool.remainingBalance,
-            dPool.ratePerSecond,
-            dPool.tokenAddress,
-            dPool.startTime,
-            dPool.stopTime,
-            dPool.isCreated,
-            dPool.dVType
+            _dPool.dPoolId,
+            _dPool.dPoolName,
+            _dPool.creator,
+            _dPool.recipients,
+            _dPool.deposit,
+            _dPool.remainingBalance,
+            _dPool.ratePerSecond,
+            _dPool.tokenAddress,
+            _dPool.startTime,
+            _dPool.stopTime,
+            _dPool.isCreated,
+            _dPool.dVType
         );
     }
 
@@ -146,6 +153,7 @@ contract DecentralizedPools {
      *  when startTime is reached.
      */
     function createEthDPool(
+        string calldata dPoolName,
         address[] calldata recipients,
         uint256 startTime,
         uint256 stopTime
@@ -153,17 +161,17 @@ contract DecentralizedPools {
         public
         payable
         validateInput(recipients, msg.value, startTime, stopTime)
-        validateAndMapRecipients(recipients)
         returns (uint256)
     {
         return
             createDPool(
+                dPoolName,
                 recipients,
                 msg.value,
                 payable(address(0x0)),
-                uint256(Stream.DValueType.ETH),
                 startTime,
-                stopTime
+                stopTime,
+                uint256(Stream.DValueType.ETH)
             );
     }
 
@@ -171,6 +179,7 @@ contract DecentralizedPools {
      * @notice Creates a DPool with a manual starter switch before calculating rates per second.
      */
     function createTokenDPool(
+        string calldata dPoolName,
         address[] calldata recipients,
         uint256 deposit,
         address payable tokenAddress,
@@ -180,17 +189,17 @@ contract DecentralizedPools {
         public
         payable
         validateInput(recipients, deposit, startTime, stopTime)
-        validateAndMapRecipients(recipients)
         returns (uint256)
     {
         return
             createDPool(
+                dPoolName,
                 recipients,
                 toWei(deposit),
                 tokenAddress,
-                uint256(Stream.DValueType.TOKEN),
                 startTime,
-                stopTime
+                stopTime,
+                uint256(Stream.DValueType.TOKEN)
             );
     }
 
@@ -205,13 +214,14 @@ contract DecentralizedPools {
      * @param _stopTime - of the distribution
      */
     function createDPool(
+        string calldata _dPoolName,
         address[] calldata _recipients,
         uint256 _deposit,
         address payable _tokenAddress,
-        uint256 _type,
         uint256 _startTime,
-        uint256 _stopTime
-    ) internal returns (uint256) {
+        uint256 _stopTime,
+        uint256 _type
+    ) internal validateAndMapRecipients(_recipients) returns (uint256) {
         uint256 _ratePerSecond = DPoolUtil.calculateRPS(
             _deposit,
             _startTime,
@@ -220,6 +230,7 @@ contract DecentralizedPools {
 
         Stream.DPool memory dPool = Stream.DPool({
             dPoolId: dPoolIdCounter,
+            dPoolName: _dPoolName,
             creator: msg.sender,
             recipients: _recipients,
             deposit: _deposit,
@@ -231,10 +242,8 @@ contract DecentralizedPools {
             stopTime: _stopTime,
             isCreated: true
         });
-        dPools[dPoolIdCounter] = dPool;
-        uint256[] storage creatorPoolIds = dPoolIdsByCreator[msg.sender];
-        creatorPoolIds.push(dPoolIdCounter);
 
+        saveDPool(dPool);
         transferToContract(_tokenAddress, _type, _deposit, msg.value);
 
         emit CreateDPool(
@@ -242,20 +251,22 @@ contract DecentralizedPools {
             msg.sender,
             _recipients,
             _deposit,
-            _ratePerSecond,
             _tokenAddress,
             _startTime,
             _stopTime,
             _type
         );
 
-        (bool incremented, uint256 nextId) = SafeMath.tryAdd(
-            dPoolIdCounter,
-            uint256(1)
-        );
-        require(incremented, "dPoolId not incremented");
+        dPoolIdCounter += uint256(1);
 
         return dPool.dPoolId;
+    }
+
+    // save given dPool on chain and map dPoolId
+    function saveDPool(Stream.DPool memory dPool) private {
+        dPools[dPool.dPoolId] = dPool;
+        uint256[] storage creatorPoolIds = dPoolIdsByCreator[msg.sender];
+        creatorPoolIds.push(dPool.dPoolId);
     }
 
     // transfers tokens to contract

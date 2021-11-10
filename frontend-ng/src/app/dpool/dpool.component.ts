@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { DPool } from '../DPool';
 import * as moment from 'moment';
 import { DpoolService } from '../dpool.service';
+import { HttpClient } from '@angular/common/http';
 
 declare let document: any;
 
@@ -13,15 +14,12 @@ declare let document: any;
 export class DpoolComponent implements OnInit {
 
   jdValue = '';
-  document;
 
   @Input() dPool: DPool;
 
   constructor(public dPoolService: DpoolService) { }
 
   ngOnInit(): void {
-    console.log('pool' + this.dPool.dPoolName);
-    this.document = document;
   }
 
   get startTime() {
@@ -31,6 +29,15 @@ export class DpoolComponent implements OnInit {
   get stopTime() {
     return (moment(new Date(this.dPool.stopTime))).format('DD.MM.yyyy hh:mm:ss');
   }
+
+  devaluate(num) {
+    return new Intl.NumberFormat(`en-US`, {
+      currency: `USD`,
+      style: 'currency',
+    }).format(num);
+  }
+
+
 
   arrow(poolId) {
     document.getElementById(poolId).click();

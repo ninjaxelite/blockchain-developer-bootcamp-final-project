@@ -11,6 +11,7 @@ contract Stream {
 
     struct DPool {
         uint256 dPoolId;
+        string dPoolName;
         address creator;
         address[] recipients;
         uint256 deposit;
