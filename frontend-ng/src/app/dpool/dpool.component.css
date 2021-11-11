@@ -38,3 +38,14 @@ table, tr, td {
 .arrow {
     background-color: #d5cfcf;font-size:23px;line-height: 15px;bottom:4px;padding:3px;margin:0;min-width:10px;
 }
+
+.abs-btn-del {
+    position: absolute;
+    left: auto;
+    right: 20px;
+    top: 15px;
+}
+
+::ng-deep.mat-menu-panel {
+    max-width: 360px !important;
+}

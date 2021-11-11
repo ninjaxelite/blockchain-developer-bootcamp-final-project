@@ -52,30 +52,14 @@ export class AppComponent implements OnInit {
       this.disableStartAppBtn = true;
       window.alert('Non-Ethereum browser detected. You should consider trying MetaMask!');
     }
-    let p = {
-      dPoolId: '1',
-      dPoolName: 'test',
-      creator: '0x0AAFf73f22398d269E3Fb1D7582F5B8CDa3A228D',
-      recipients: ['0x0AAFf73f22398d269E3Fb1D7582F5B8CDa3A228D', '0x0AAFf73f22398d269E3Fb1D7582F5B8CDa3A228D'],
-      deposit: 100,
-      depositDevaluated: 356563,
-      remainingBalance: 100,
-      remainingBalanceDevaluated: 234234,
-      startTime: new Date().getTime(),
-      stopTime: new Date().getTime()
-    } as DPool;
-    this.dPools.push(p);
-    this.dPools.push(p);
-    this.dPools.push(p);
-    this.dPools.push(p);
-    this.dPools.push(p);
-    this.dPools.push(p);
-    this.dPools.push(p);
-    this.dPools.push(p);
 
     this.httpClient.get("https://api.coinmarketcap.com/data-api/v3/tools/price-conversion?convert_id=2781&id=1027&amount=1")
-      .subscribe((capResponseD: CapResponse) => {
+      .subscribe(async (capResponseD: CapResponse) => {
         this.currentEthPrice = capResponseD.data.quote[0].price;
+
+        if (window.ethereum.selectedAddress) {
+          this.startApp();
+        }
       });
 
     this.dPoolService.errorSubject

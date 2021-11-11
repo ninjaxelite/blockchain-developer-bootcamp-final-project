@@ -49,7 +49,8 @@ export class DpoolService {
     const dPools: DPool[] = [];
     for (let i = 0; i < dPoolsCount; i++) {
       const dPool = await dPoolsContract.getDPool(i);
-      dPools.push(this.convertToDPoolObject(dPool, currentEthPrice));
+      const tokenName = this.getTokenName();
+      dPools.push(this.convertToDPoolObject(dPool, currentEthPrice, tokenName));
     }
     return dPools;
   }
@@ -74,25 +75,35 @@ export class DpoolService {
     return null;
   }
 
-  private convertToDPoolObject(_dPool, currentEthPrice: number) {
+  private convertToDPoolObject(_dPool, currentEthPrice: number, tokenName) {
     return {
       dPoolId: this.getBNString(_dPool[0]),
       dPoolName: _dPool[1],
       creator: _dPool[2],
       recipients: _dPool[3],
-      deposit: +this.getBNString(_dPool[4]),
-      depositDevaluated: +this.getBNString(_dPool[4]) * currentEthPrice,
-      remainingBalance: +this.getBNString(_dPool[5]),
-      remainingBalanceDevaluated: +this.getBNString(_dPool[5]) * currentEthPrice,
+      deposit: +this.formatEth(_dPool[4]),
+      depositDevaluated: +this.formatEth(_dPool[4]) * currentEthPrice,
+      remainingBalance: +this.formatEth(_dPool[5]),
+      remainingBalanceDevaluated: +this.formatEth(_dPool[5]) * currentEthPrice,
       token: _dPool[7],
+      tokenName: tokenName,
       startTime: +this.getBNString(_dPool[8]),
       stopTime: +this.getBNString(_dPool[9]),
-      type: this.getBNString(_dPool[11]),
+      type: +this.getBNString(_dPool[11]),
     } as unknown as DPool;
+  }
+
+  private getTokenName() {
+    // TODO
+    return 'TRX';
   }
 
   private getBNString(val): string {
     return ethers.BigNumber.from(val).toString();
+  }
+
+  private formatEth(val) {
+    return ethers.utils.formatEther(val);
   }
 
   copyToCB(account) {

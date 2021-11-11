@@ -8,8 +8,9 @@ export class DPool {
     remainingBalance: number;
     remainingBalanceDevaluated: number;
     token: string;
+    tokenName: string;
     startTime: number;
     stopTime: number;
-    type: string;
+    type: number;
 }
 

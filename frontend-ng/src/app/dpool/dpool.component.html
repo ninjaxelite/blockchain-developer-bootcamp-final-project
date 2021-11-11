@@ -1,6 +1,11 @@
 <div class="card dpool">
     <div class="dpool-header">
         <svg width="55" class="center" [data-jdenticon-value]="jdValue"></svg>
+        <div class="abs-btn-del">
+            <button mat-mini-fab color="warn" aria-label="Delete DPool" (click)="deleteDPool()">
+                <mat-icon>delete</mat-icon>
+            </button>
+        </div>
     </div>
     <div class="card-details center" style="padding: 10px;">
         <table cellspacing="0" cellpadding="0">
@@ -47,6 +52,6 @@
                 <td style="padding-top: 5px;"><span>{{stopTime}}</span></td>
             </tr>
         </table>
-        <div style="padding-top: 10px;">Value is distributed in <strong>ETH</strong></div>
+        <div style="padding-top: 10px;">Value is distributed in <strong>{{valueType}}</strong></div>
     </div>
 </div>

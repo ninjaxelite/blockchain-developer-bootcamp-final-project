@@ -14,12 +14,22 @@ declare let document: any;
 export class DpoolComponent implements OnInit {
 
   jdValue = '';
+  valueType = 'ETH';
 
   @Input() dPool: DPool;
 
   constructor(public dPoolService: DpoolService) { }
 
   ngOnInit(): void {
+    if (this.dPool.type === 0) {
+      this.valueType = 'ETH';
+    } else {
+      this.valueType = this.dPool.tokenName;
+    }
+  }
+
+  deleteDPool() {
+    //this.dPoolService.deleteDPool
   }
 
   get startTime() {

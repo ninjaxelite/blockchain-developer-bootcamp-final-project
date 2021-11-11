@@ -27,7 +27,9 @@
     <label *ngIf="metamask.disabled">Complete the verification process with MetaMask.</label>
   </div>
 
-  <span *ngIf="loading" class="center" style="font-size: 40px;"><strong>Loading...</strong></span>
+  <div *ngIf="loading" style="margin: 20px;">
+    <mat-spinner class="center mat-spinner-color" [diameter]="70"></mat-spinner>
+  </div>
 
   <div *ngIf="!loading && selectedAccount" style="margin-bottom: 135px;">
     <button mat-raised-button class="start-app" (click)="showDPoolForm()">
@@ -35,6 +37,13 @@
     </button>
 
     <div #form style="display: none">
+      <div style="float: left;margin-left: 9px;font-size:18px">
+        <span style="margin-right: 6px;">Distribute value in:</span>
+        <mat-radio-group aria-label="Select an option">
+          <mat-radio-button style="margin-right: 7px;" value="1" checked="true"><strong>ETH</strong></mat-radio-button>
+          <mat-radio-button value="2" [disabled]="true">Token</mat-radio-button>
+        </mat-radio-group>
+      </div>
       <div style="display: flex; justify-content: flex-end">
         <span class="recipient-del" (click)="closeForm()">x</span>
       </div>

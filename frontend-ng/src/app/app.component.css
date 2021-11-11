@@ -94,3 +94,7 @@ footeeer {
   font-weight: 500;
   font-size: 17px;
 }
+
+.mat-spinner-color::ng-deep circle{
+  stroke: #417be5 !important;
+  }
