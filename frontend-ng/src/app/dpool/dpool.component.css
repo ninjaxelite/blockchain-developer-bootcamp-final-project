@@ -6,6 +6,7 @@
 .dpool {
     border: 2px solid rgb(139, 118, 118);
     border-radius: 20px;
+    min-width: 480px;
 }
 
 .dpool-header {

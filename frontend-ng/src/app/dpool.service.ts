@@ -35,20 +35,44 @@ export class DpoolService {
     return new ethers.providers.Web3Provider(window.ethereum)
   }
 
-  public async getDPools(selectedAccount: string, dPoolsContract, currentEthPrice: number): Promise<DPool[]> {
+  public async getRecipientDPools(selectedAccount: string, dPoolsContract, currentEthPrice: number): Promise<DPool[]> {
     try {
-      const dPoolCount = await dPoolsContract.getDPoolsCount({ from: selectedAccount });
-      return this.loadAvailableDPools(dPoolsContract, ethers.BigNumber.from(dPoolCount).toString(), currentEthPrice);
+      const dPoolIds: number[] = await dPoolsContract.getRecipientDPoolIds({ from: selectedAccount });
+      console.log(dPoolIds);
+      return this.loadDPoolsByIds(selectedAccount, dPoolsContract, dPoolIds, currentEthPrice);
     } catch (e) {
       console.log('Error : ', e.message);
       return null;
     }
   }
 
-  private async loadAvailableDPools(dPoolsContract, dPoolsCount: number, currentEthPrice: number): Promise<DPool[]> {
+  private async loadDPoolsByIds(selectedAccount: string, dPoolsContract, dPoolIds: number[], currentEthPrice: number): Promise<DPool[]> {
+    const dPools: DPool[] = [];
+    for (let i = 0; i < dPoolIds.length; i++) {
+      const dPool = await dPoolsContract.getDPoolById(dPoolIds[i]);
+      const receptorBalance = await dPoolsContract.balanceOf(dPoolIds[i], selectedAccount);
+      const tokenName = this.getTokenName();
+      const myDPool: DPool = this.convertToDPoolObject(dPool, currentEthPrice, tokenName);
+      myDPool.receptorBalance = receptorBalance;
+      dPools.push(myDPool);
+    }
+    return dPools;
+  }
+
+  public async getDPools(selectedAccount: string, dPoolsContract, currentEthPrice: number): Promise<DPool[]> {
+    try {
+      const dPoolCount = await dPoolsContract.getDPoolsCount({ from: selectedAccount });
+      return this.loadAvailableDPools(selectedAccount, dPoolsContract, ethers.BigNumber.from(dPoolCount).toString(), currentEthPrice);
+    } catch (e) {
+      console.log('Error : ', e.message);
+      return null;
+    }
+  }
+
+  private async loadAvailableDPools(selectedAccount: string, dPoolsContract, dPoolsCount: number, currentEthPrice: number): Promise<DPool[]> {
     const dPools: DPool[] = [];
     for (let i = 0; i < dPoolsCount; i++) {
-      const dPool = await dPoolsContract.getDPool(i);
+      const dPool = await dPoolsContract.getDPool(i, { from: selectedAccount });
       const tokenName = this.getTokenName();
       dPools.push(this.convertToDPoolObject(dPool, currentEthPrice, tokenName));
     }
@@ -89,7 +113,7 @@ export class DpoolService {
       tokenName: tokenName,
       startTime: +this.getBNString(_dPool[8]),
       stopTime: +this.getBNString(_dPool[9]),
-      type: +this.getBNString(_dPool[11]),
+      type: +this.getBNString(_dPool[10]),
     } as unknown as DPool;
   }
 

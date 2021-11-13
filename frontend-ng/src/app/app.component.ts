@@ -27,6 +27,7 @@ export class AppComponent implements OnInit {
 
   selectedAccount;
   dPools: DPool[] = [];
+  recipientDPools: DPool[] = [];
 
   disableStartAppBtn = false;
   loading: boolean = false;
@@ -81,6 +82,7 @@ export class AppComponent implements OnInit {
     this.dPoolsContract = await this.dPoolService.initContract(this.provider);
 
     this.getDPools();
+    this.getReceiverDPools();
 
     this.loading = false;
     this.cdr.detectChanges();
@@ -89,6 +91,11 @@ export class AppComponent implements OnInit {
   public async getDPools() {
     const myDPools: DPool[] = await this.dPoolService.getDPools(this.selectedAccount, this.dPoolsContract, this.currentEthPrice);
     myDPools.forEach(dp => this.dPools.push(dp));
+  }
+
+  public async getReceiverDPools() {
+    const myDPools: DPool[] = await this.dPoolService.getRecipientDPools(this.selectedAccount, this.dPoolsContract, this.currentEthPrice);
+    myDPools.forEach(dp => this.recipientDPools.push(dp));
   }
 
   public async createDPool() {
@@ -110,7 +117,8 @@ export class AppComponent implements OnInit {
       remainingBalanceDevaluated: this.dPoolDeposit * this.currentEthPrice,
       remainingBalance: this.dPoolDeposit,
       startTime: this.startDate.toDate().getTime(),
-      stopTime: this.endDate.toDate().getTime()
+      stopTime: this.endDate.toDate().getTime(),
+      type: 0
     } as DPool;
 
     this.dPoolService.createDPoolOnChain(newDPool, this.dPoolsContract, this.signer)

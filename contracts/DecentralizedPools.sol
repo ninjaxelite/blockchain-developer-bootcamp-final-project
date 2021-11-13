@@ -57,6 +57,8 @@ contract DecentralizedPools {
 
     // every recipient address by dPoolId
     mapping(address => mapping(uint256 => bool)) recipientsByDPoolId;
+    // get dPool ids by recipient
+    mapping(address => uint256[]) recipientDPoolIds;
 
     // ident of every new dPool
     uint256 dPoolIdCounter = 1;
@@ -94,11 +96,13 @@ contract DecentralizedPools {
             );
 
             /*
-            TODO Use modifiers only for checks
+            TODO Use modifiers only for checks - 
             move to function
             */
             // map recipients by dPoolId for convinient access
             recipientsByDPoolId[recipients[i]][dPoolIdCounter] = true;
+            uint256[] storage dPIds = recipientDPoolIds[recipients[i]];
+            dPIds.push(dPoolIdCounter);
         }
         _;
     }
@@ -107,13 +111,17 @@ contract DecentralizedPools {
         owner = msg.sender;
     }
 
-    function getDPoolsCount() public view returns (uint256) {
+    function getRecipientDPoolIds() external view returns (uint256[] memory) {
+        return recipientDPoolIds[msg.sender];
+    }
+
+    function getDPoolsCount() external view returns (uint256) {
         uint256[] memory _dPoolIds = dPoolIdsByCreator[msg.sender];
         return _dPoolIds.length;
     }
 
     function getDPool(uint256 index)
-        public
+        external
         view
         returns (
             uint256,
@@ -126,7 +134,6 @@ contract DecentralizedPools {
             address,
             uint256,
             uint256,
-            bool,
             uint256
         )
     {
@@ -143,7 +150,39 @@ contract DecentralizedPools {
             _dPool.tokenAddress,
             _dPool.startTime,
             _dPool.stopTime,
-            _dPool.isCreated,
+            _dPool.dVType
+        );
+    }
+
+    function getDPoolById(uint256 dPId)
+        external
+        view
+        returns (
+            uint256,
+            string memory,
+            address,
+            address[] memory,
+            uint256,
+            uint256,
+            uint256,
+            address,
+            uint256,
+            uint256,
+            uint256
+        )
+    {
+        Stream.DPool memory _dPool = dPools[dPId];
+        return (
+            _dPool.dPoolId,
+            _dPool.dPoolName,
+            _dPool.creator,
+            _dPool.recipients,
+            _dPool.deposit,
+            _dPool.remainingBalance,
+            _dPool.ratePerSecond,
+            _dPool.tokenAddress,
+            _dPool.startTime,
+            _dPool.stopTime,
             _dPool.dVType
         );
     }
@@ -264,10 +303,13 @@ contract DecentralizedPools {
 
     // save given dPool on chain and map dPoolId
     function saveDPool(Stream.DPool memory dPool) private {
+        registerDPoolIdsToRecipients(dPool);
         dPools[dPool.dPoolId] = dPool;
         uint256[] storage creatorPoolIds = dPoolIdsByCreator[msg.sender];
         creatorPoolIds.push(dPool.dPoolId);
     }
+
+    function registerDPoolIdsToRecipients(Stream.DPool memory dPool) private {}
 
     // transfers tokens to contract
     function transferTokens(

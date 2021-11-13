@@ -2,9 +2,11 @@
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
 
+import contractAddress from '../contract/contractaddress.json';
+
 export const environment = {
   production: false,
-  dPoolContract: '0x26aFF8e95d90282Fe9c4D06256086E1098488701'
+  dPoolContract: contractAddress.contract
 };
 
 /*

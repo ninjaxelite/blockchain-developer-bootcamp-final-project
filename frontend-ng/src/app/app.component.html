@@ -15,7 +15,7 @@
     <svg width="55" [data-jdenticon-value]="jdValue"></svg>
   </div>
   <span *ngIf="selectedAccount" class="center" style=" font-size: 17px;">
-    <span class="center">Logged in as</span><br />
+    <span class="center">Logged in as</span>
     <button mat-button style="font-size: 20px;"
       (click)="dPoolService.copyToCB(selectedAccount)">{{selectedAccount}}</button>
   </span>
@@ -31,81 +31,105 @@
     <mat-spinner class="center mat-spinner-color" [diameter]="70"></mat-spinner>
   </div>
 
-  <div *ngIf="!loading && selectedAccount" style="margin-bottom: 135px;">
-    <button mat-raised-button class="start-app" (click)="showDPoolForm()">
-      Create DPool
-    </button>
+  <mat-tab-group *ngIf="!loading && selectedAccount" style="margin-bottom: 135px;" class="mt-3" animationDuration="0ms">
 
-    <div #form style="display: none">
-      <div style="float: left;margin-left: 9px;font-size:18px">
-        <span style="margin-right: 6px;">Distribute value in:</span>
-        <mat-radio-group aria-label="Select an option">
-          <mat-radio-button style="margin-right: 7px;" value="1" checked="true"><strong>ETH</strong></mat-radio-button>
-          <mat-radio-button value="2" [disabled]="true">Token</mat-radio-button>
-        </mat-radio-group>
-      </div>
-      <div style="display: flex; justify-content: flex-end">
-        <span class="recipient-del" (click)="closeForm()">x</span>
-      </div>
-      <div style="margin-top: 15px;">
-        <mat-form-field class="form-details" appearance="fill">
-          <mat-label>DPool name</mat-label>
-          <input matInput placeholder="sample DAO distribution" name="dpname" [(ngModel)]="dPoolName">
-        </mat-form-field>
-        <mat-form-field class="form-details" appearance="fill">
-          <mat-label>Deposit</mat-label>
-          <input matInput name="depo" [(ngModel)]="dPoolDeposit">
-        </mat-form-field>
-        <mat-form-field class="form-details" appearance="fill">
-          <mat-label>Start date</mat-label>
-          <input matInput [matDatepicker]="picker1" placeholder="Start date" name="sd" [(ngModel)]="startDate">
-          <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
-          <mat-datepicker #picker1></mat-datepicker>
-        </mat-form-field>
-        <mat-form-field class="form-details" appearance="fill">
-          <mat-label>End date</mat-label>
-          <input matInput [matDatepicker]="picker2" placeholder="End date" name="ed" [(ngModel)]="endDate">
-          <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
-          <mat-datepicker #picker2></mat-datepicker>
-        </mat-form-field>
-        <br />
-        <div class="form-details" style="max-width: 965px;margin-bottom: 10px;">
-          <div style="margin-bottom: 15px;">
-            <button mat-raised-button class="add-recipient" [disabled]="disableAddRecipientBtn()"
-              (click)="addRecipient()">
-              Add recipient
-            </button>
-            <mat-form-field style="font-size: 14px;width: 345px;" appearance="fill">
-              <mat-label>recipient address</mat-label>
-              <input matInput placeholder="0x012345..." name="recip" [(ngModel)]="recipientAddress">
-            </mat-form-field>
+    <!-- My DPools-->
+    <mat-tab label="My DPools">
+
+      <div class="mt-3">
+        <button mat-raised-button class="start-app" (click)="showDPoolForm()">
+          Create DPool
+        </button>
+
+        <div #form style="display: none">
+          <div style="float: left;margin-left: 9px;font-size:18px">
+            <span style="margin-right: 6px;">Distribute value in:</span>
+            <mat-radio-group aria-label="Select an option">
+              <mat-radio-button style="margin-right: 15px;" value="1" checked="true"><strong>ETH</strong>
+              </mat-radio-button>
+              <mat-radio-button value="2" [disabled]="true">Token</mat-radio-button>
+            </mat-radio-group>
           </div>
-          <div *ngFor="let r of recipients" style="height: 47px;"><span class="recipient">{{r}}<span
-                class="recipient-del" (click)="delRecipient(r)">x</span></span></div>
+          <div style="display: flex; justify-content: flex-end">
+            <span class="recipient-del" (click)="closeForm()">x</span>
+          </div>
+          <div style="margin-top: 15px;">
+            <mat-form-field class="form-details" appearance="fill">
+              <mat-label>DPool name</mat-label>
+              <input matInput placeholder="sample DAO distribution" name="dpname" [(ngModel)]="dPoolName">
+            </mat-form-field>
+            <mat-form-field class="form-details" appearance="fill">
+              <mat-label>Deposit</mat-label>
+              <input matInput name="depo" [(ngModel)]="dPoolDeposit">
+            </mat-form-field>
+            <mat-form-field class="form-details" appearance="fill">
+              <mat-label>Start date</mat-label>
+              <input matInput [matDatepicker]="picker1" placeholder="Start date" name="sd" [(ngModel)]="startDate">
+              <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+              <mat-datepicker #picker1></mat-datepicker>
+            </mat-form-field>
+            <mat-form-field class="form-details" appearance="fill">
+              <mat-label>End date</mat-label>
+              <input matInput [matDatepicker]="picker2" placeholder="End date" name="ed" [(ngModel)]="endDate">
+              <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+              <mat-datepicker #picker2></mat-datepicker>
+            </mat-form-field>
+            <br />
+            <div class="form-details" style="max-width: 965px;margin-bottom: 10px;">
+              <div style="margin-bottom: 15px;">
+                <button mat-raised-button class="add-recipient" [disabled]="disableAddRecipientBtn()"
+                  (click)="addRecipient()">Add recipient</button>
+                <mat-form-field style="font-size: 14px;width: 345px;" appearance="fill">
+                  <mat-label>recipient address</mat-label>
+                  <input matInput placeholder="0x012345..." name="recip" [(ngModel)]="recipientAddress">
+                </mat-form-field>
+              </div>
+              <div *ngFor="let r of recipients" style="height: 47px;"><span class="recipient">{{r}}<span
+                    class="recipient-del" (click)="delRecipient(r)">x</span></span></div>
+            </div>
+            <p #errormsg style="display: none;" class="errormsg">Every field is
+              required and
+              at least
+              one recipient address must be added!</p>
+          </div>
+
+          <button mat-raised-button class="create-dpool" (click)="createDPool()">
+            Create
+          </button>
         </div>
-        <p #errormsg style="display: none;" class="errormsg">Every field is
-          required and
-          at least
-          one recipient address must be added!</p>
+
+        <mat-divider style="margin-top: 15px;margin-bottom:15px;"></mat-divider>
+
+        <span *ngIf="dPools.length === 0">No DPools exist for logged in user</span>
+
+        <div class="container">
+          <div class="row">
+            <div *ngFor="let dp of dPools" class="col-sm-6" style="margin-bottom: 15px;">
+              <app-dpool [dPool]="dp"></app-dpool>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </mat-tab>
+
+    <!-- Joined DPools -->
+    <mat-tab label="Participating DPools">
+
+      <div class="center">
+        <div class="container">
+          <div class="row">
+            <div *ngFor="let rdp of recipientDPools" class="col-sm-6" style="margin-bottom: 15px;">
+              <app-receptor [dPool]="rdp"></app-receptor>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <button mat-raised-button class="create-dpool" (click)="createDPool()">
-        Create
-      </button>
-    </div>
+    </mat-tab>
 
-    <mat-divider style="margin-top: 15px;margin-bottom:15px;"></mat-divider>
-
-    <div class="container">
-      <div class="row">
-        <div *ngFor="let dp of dPools" class="col-sm-6" style="margin-bottom: 15px;">
-          <app-dpool [dPool]="dp"></app-dpool>
-        </div>
-      </div>
-
-    </div>
-
-  </div>
+  </mat-tab-group>
 
 </div>
 

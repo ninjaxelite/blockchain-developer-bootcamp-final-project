@@ -19,6 +19,9 @@ import { HttpClientModule } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTabsModule } from '@angular/material/tabs';
+import { ReceptorComponent } from './receptor/receptor.component';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @NgModule({
   declarations: [
@@ -26,6 +29,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     ToolbarComponent,
     DpoolComponent,
     SnackbarComponent,
+    ReceptorComponent,
   ],
   imports: [
     BrowserModule,
@@ -43,7 +47,9 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     HttpClientModule,
     MatRadioModule,
     MatProgressSpinnerModule,
-    MatIconModule
+    MatIconModule,
+    MatTabsModule,
+    MatTooltipModule
   ],
   providers: [],
   bootstrap: [AppComponent]

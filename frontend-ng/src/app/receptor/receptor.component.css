@@ -1,0 +1,33 @@
+.center {
+    margin: 0 auto;
+    display: table;
+}  
+
+.circle {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: #ff963c;
+}
+
+.rotate {
+    background-color: #2486ff;
+    transform: rotate(90deg);
+
+  /* Legacy vendor prefixes that you probably don't need... */
+
+  /* Safari */
+  -webkit-transform: rotate(90deg);
+
+  /* Firefox */
+  -moz-transform: rotate(90deg);
+
+  /* IE */
+  -ms-transform: rotate(90deg);
+
+  /* Opera */
+  -o-transform: rotate(90deg);
+
+  /* Internet Explorer */
+  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+}

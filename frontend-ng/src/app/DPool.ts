@@ -12,5 +12,7 @@ export class DPool {
     startTime: number;
     stopTime: number;
     type: number;
+
+    receptorBalance: number;
 }
 
