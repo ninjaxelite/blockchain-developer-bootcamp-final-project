@@ -16,6 +16,12 @@
 .metamask-icon {
   width: 20px;
   position: relative;
+  top: -2px;
+}
+
+.insta-icon {
+  width: 20px;
+  position: relative;
   top: 5px;
 }
 

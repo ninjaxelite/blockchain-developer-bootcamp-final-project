@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import * as moment from 'moment';
 import { DPool } from '../DPool';
+import { DpoolService } from '../dpool.service';
 
 @Component({
   selector: 'app-receptor',
@@ -13,13 +14,21 @@ export class ReceptorComponent implements OnInit {
 
   @Input() dPool: DPool;
 
-  constructor() { }
+  constructor(private dPoolService: DpoolService) { }
 
   ngOnInit(): void {
   }
 
-  public withdraw() {
-
+  public async withdraw() {
+    const selectedAccount = await this.dPoolService.listAccounts();
+    const receptorBalance = await this.dPoolService.dPoolsContract
+      .balanceOf(this.dPool.dPoolId, selectedAccount);
+    console.log('balance: ');
+    console.log(this.dPoolService.formatEth(receptorBalance));
+    if (receptorBalance > 0) {
+      await this.dPoolService.withdrawFromDPool(this.dPool.dPoolId,
+        this.dPoolService.formatEth(receptorBalance));
+    }
   }
 
   get balance() {

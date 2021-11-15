@@ -13,44 +13,55 @@ declare let ethers: any;
 })
 export class DpoolService {
 
+  provider;
+  signer;
+  dPoolsContract;
+
   errorSubject = new Subject<string>();
 
   constructor(private httpClient: HttpClient) { }
 
   public async listAccounts() {
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-
     if (accounts) {
       return accounts[0];
     }
     return null;
   }
 
-  public async initContract(provider) {
-    return new ethers.Contract(environment.dPoolContract,
-      DecentralizedPools.abi, provider);
+  public async initContract() {
+    this.dPoolsContract = new ethers.Contract(environment.dPoolContract,
+      DecentralizedPools.abi, this.provider);
+  }
+
+  public async initInfura() {
+    this.provider = new ethers.providers.InfuraProvider(
+      'rinkeby', // or 'ropsten', 'rinkeby', 'kovan', 'goerli'
+      'f506030abcda4317914e240321aac6f9'
+    );
+    this.signer = this.provider.getSigner();
   }
 
   public async initWeb3() {
-    return new ethers.providers.Web3Provider(window.ethereum)
+    this.provider = new ethers.providers.Web3Provider(window.ethereum);
+    this.signer = this.provider.getSigner();
   }
 
-  public async getRecipientDPools(selectedAccount: string, dPoolsContract, currentEthPrice: number): Promise<DPool[]> {
+  public async getRecipientDPools(selectedAccount: string, currentEthPrice: number): Promise<DPool[]> {
     try {
-      const dPoolIds: number[] = await dPoolsContract.getRecipientDPoolIds({ from: selectedAccount });
-      console.log(dPoolIds);
-      return this.loadDPoolsByIds(selectedAccount, dPoolsContract, dPoolIds, currentEthPrice);
+      const dPoolIds: number[] = await this.dPoolsContract.getRecipientDPoolIds({ from: selectedAccount });
+      return this.loadDPoolsByIds(selectedAccount, dPoolIds, currentEthPrice);
     } catch (e) {
       console.log('Error : ', e.message);
       return null;
     }
   }
 
-  private async loadDPoolsByIds(selectedAccount: string, dPoolsContract, dPoolIds: number[], currentEthPrice: number): Promise<DPool[]> {
+  private async loadDPoolsByIds(selectedAccount: string, dPoolIds: number[], currentEthPrice: number): Promise<DPool[]> {
     const dPools: DPool[] = [];
     for (let i = 0; i < dPoolIds.length; i++) {
-      const dPool = await dPoolsContract.getDPoolById(dPoolIds[i]);
-      const receptorBalance = await dPoolsContract.balanceOf(dPoolIds[i], selectedAccount);
+      const dPool = await this.dPoolsContract.getDPoolById(dPoolIds[i]);
+      const receptorBalance = await this.dPoolsContract.balanceOf(dPoolIds[i], selectedAccount);
       const tokenName = this.getTokenName();
       const myDPool: DPool = this.convertToDPoolObject(dPool, currentEthPrice, tokenName);
       myDPool.receptorBalance = receptorBalance;
@@ -59,27 +70,27 @@ export class DpoolService {
     return dPools;
   }
 
-  public async getDPools(selectedAccount: string, dPoolsContract, currentEthPrice: number): Promise<DPool[]> {
+  public async getDPools(selectedAccount: string, currentEthPrice: number): Promise<DPool[]> {
     try {
-      const dPoolCount = await dPoolsContract.getDPoolsCount({ from: selectedAccount });
-      return this.loadAvailableDPools(selectedAccount, dPoolsContract, ethers.BigNumber.from(dPoolCount).toString(), currentEthPrice);
+      const dPoolCount = await this.dPoolsContract.getDPoolsCount({ from: selectedAccount });
+      return this.loadAvailableDPools(selectedAccount, ethers.BigNumber.from(dPoolCount).toString(), currentEthPrice);
     } catch (e) {
       console.log('Error : ', e.message);
       return null;
     }
   }
 
-  private async loadAvailableDPools(selectedAccount: string, dPoolsContract, dPoolsCount: number, currentEthPrice: number): Promise<DPool[]> {
+  private async loadAvailableDPools(selectedAccount: string, dPoolsCount: number, currentEthPrice: number): Promise<DPool[]> {
     const dPools: DPool[] = [];
     for (let i = 0; i < dPoolsCount; i++) {
-      const dPool = await dPoolsContract.getDPool(i, { from: selectedAccount });
+      const dPool = await this.dPoolsContract.getDPool(i, { from: selectedAccount });
       const tokenName = this.getTokenName();
       dPools.push(this.convertToDPoolObject(dPool, currentEthPrice, tokenName));
     }
     return dPools;
   }
 
-  public async createDPoolOnChain(newDPool: DPool, dPoolsContract, signer) {
+  public async createDPoolOnChain(newDPool: DPool) {
     try {
       const options = {
         from: newDPool.creator,
@@ -87,10 +98,25 @@ export class DpoolService {
         gasLimit: ethers.utils.hexlify(4000000),
         gasPrice: ethers.utils.hexlify(8000000000)
       };
-
-      const unsignedTx = await dPoolsContract.populateTransaction
+      const unsignedTx = await this.dPoolsContract.populateTransaction
         .createEthDPool(newDPool.dPoolName, newDPool.recipients, newDPool.startTime, newDPool.stopTime, options);
-      const response = await signer.sendTransaction(unsignedTx);
+      const response = await this.signer.sendTransaction(unsignedTx);
+      return await response.wait();
+    } catch (e) {
+      this.errorSubject.next(e.message);
+      console.log(e);
+    }
+    return null;
+  }
+
+  public async withdrawFromDPool(dpId: string, amount: number) {
+    try {
+      const options = {
+        from: await this.listAccounts()
+      };
+      const unsignedTx = await this.dPoolsContract.populateTransaction
+        .withdrawFromDPool(dpId, amount, options);
+      const response = await this.signer.sendTransaction(unsignedTx);
       return await response.wait();
     } catch (e) {
       this.errorSubject.next(e.message);
@@ -111,8 +137,8 @@ export class DpoolService {
       remainingBalanceDevaluated: +this.formatEth(_dPool[5]) * currentEthPrice,
       token: _dPool[7],
       tokenName: tokenName,
-      startTime: +this.getBNString(_dPool[8]),
-      stopTime: +this.getBNString(_dPool[9]),
+      startTime: +this.getBNString(_dPool[8]) * 1000,
+      stopTime: +this.getBNString(_dPool[9]) * 1000,
       type: +this.getBNString(_dPool[10]),
     } as unknown as DPool;
   }
@@ -126,7 +152,7 @@ export class DpoolService {
     return ethers.BigNumber.from(val).toString();
   }
 
-  private formatEth(val) {
+  public formatEth(val) {
     return ethers.utils.formatEther(val);
   }
 

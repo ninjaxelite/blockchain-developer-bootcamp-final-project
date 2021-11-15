@@ -4,24 +4,38 @@ import * as moment from 'moment';
 import { DpoolService } from './dpool.service';
 import { HttpClient } from '@angular/common/http';
 import { CapResponse } from './external-api/CapResponse';
+import { MomentDateAdapter } from '@angular/material-moment-adapter';
+import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 
 declare let window: any;
 declare let ethers: any;
 
+export const MY_FORMATS = {
+  parse: {
+    dateInput: 'l, LTS',
+  },
+  display: {
+    dateInput: 'DD-MM-YYYY hh:mm',
+    monthYearLabel: 'YYYY',
+    dateA11yLabel: 'LL',
+    monthYearA11yLabel: 'YYYY',
+  },
+};
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
+  providers: [
+    { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
+    { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
+  ]
 })
 export class AppComponent implements OnInit {
 
   @ViewChild('metamask') metamaskBtn: ElementRef;
   @ViewChild('form') form: ElementRef;
   @ViewChild('errormsg') errormsg: ElementRef;
-
-  provider;
-  signer;
-  dPoolsContract;
 
   currentEthPrice;
 
@@ -35,12 +49,12 @@ export class AppComponent implements OnInit {
   snackbarText: string;
 
   // form input - new DPool
-  dPoolName: string = 'sample';
-  dPoolDeposit: number = 10;
-  startDate = moment('11/8/2021');
-  endDate = moment('11/12/2021');
+  dPoolName: string;
+  dPoolDeposit: number;
+  startDate = moment();
+  endDate = moment().add(1, 'days');
   recipientAddress: string;
-  recipients: string[] = ['0xF9a2dE6F58f09d13c3663eA7A17e099af7e6b86F'];
+  recipients: string[] = [];
 
   constructor(private cdr: ChangeDetectorRef,
     private httpClient: HttpClient,
@@ -73,13 +87,11 @@ export class AppComponent implements OnInit {
     }
 
     this.loading = true;
-    this.provider = await this.dPoolService.initWeb3();
-    this.signer = this.provider.getSigner();
+    await this.dPoolService.initWeb3();
     this.disableStartAppBtn = false;
-
     this.selectedAccount = await this.dPoolService.listAccounts();
     this.jdValue = this.selectedAccount;
-    this.dPoolsContract = await this.dPoolService.initContract(this.provider);
+    await this.dPoolService.initContract();
 
     this.getDPools();
     this.getReceiverDPools();
@@ -89,21 +101,36 @@ export class AppComponent implements OnInit {
   }
 
   public async getDPools() {
-    const myDPools: DPool[] = await this.dPoolService.getDPools(this.selectedAccount, this.dPoolsContract, this.currentEthPrice);
+    const myDPools: DPool[] = await this.dPoolService.getDPools(this.selectedAccount, this.currentEthPrice);
     myDPools.forEach(dp => this.dPools.push(dp));
   }
 
   public async getReceiverDPools() {
-    const myDPools: DPool[] = await this.dPoolService.getRecipientDPools(this.selectedAccount, this.dPoolsContract, this.currentEthPrice);
+    const myDPools: DPool[] = await this.dPoolService.getRecipientDPools(this.selectedAccount, this.currentEthPrice);
     myDPools.forEach(dp => this.recipientDPools.push(dp));
   }
 
   public async createDPool() {
-    if (this.validateForm()) {
+    let startSeconds;
+    let stopSeconds;
+
+    if (this.isFormInvalid()) {
       this.showErrormsg('Every field is required and at least one recipient address must be added!');
       return;
     } else {
-      this.hideErrormsg();
+      startSeconds = Math.ceil(this.startDate.hour(moment().hour())
+        .minute(moment().minute()).add(1, 'minutes')
+        .toDate().getTime() / 1000);
+      stopSeconds = Math.ceil(this.endDate.hour(moment().hour())
+        .minute(moment().minute())
+        .toDate().getTime() / 1000);
+
+      if (this.isTimeRangeInvalid(startSeconds, stopSeconds)) {
+        this.showErrormsg('Time range is invalid! Start time must be in the future and Stop time needs to have Start time + 23h!');
+        return;
+      } else {
+        this.hideErrormsg();
+      }
     }
 
     this.loading = true;
@@ -116,12 +143,12 @@ export class AppComponent implements OnInit {
       depositDevaluated: this.dPoolDeposit * this.currentEthPrice,
       remainingBalanceDevaluated: this.dPoolDeposit * this.currentEthPrice,
       remainingBalance: this.dPoolDeposit,
-      startTime: this.startDate.toDate().getTime(),
-      stopTime: this.endDate.toDate().getTime(),
+      startTime: startSeconds,
+      stopTime: stopSeconds,
       type: 0
     } as DPool;
 
-    this.dPoolService.createDPoolOnChain(newDPool, this.dPoolsContract, this.signer)
+    this.dPoolService.createDPoolOnChain(newDPool)
       .then(response => {
         console.log(response);
         if (response) {
@@ -155,7 +182,12 @@ export class AppComponent implements OnInit {
     this.form.nativeElement.classList.add('myform');
   }
 
-  validateForm(): boolean {
+  isTimeRangeInvalid(startSeconds, stopSeconds) {
+    return startSeconds < Math.ceil(moment().valueOf() / 1000)
+      || stopSeconds < Math.ceil(moment().add(23, 'hours').valueOf() / 1000);
+  }
+
+  isFormInvalid(): boolean {
     return this.dPoolName == null || this.dPoolName.trim() === ''
       || this.dPoolDeposit == null || this.dPoolDeposit <= 0
       || this.startDate == null || this.endDate == null
@@ -163,9 +195,6 @@ export class AppComponent implements OnInit {
   }
 
   closeForm() {
-    //this.form.nativeElement.classList = null;
-    //this.form.nativeElement.style = 'display: none';
-    //this.hideErrormsg();
     this.clearForm();
   }
 

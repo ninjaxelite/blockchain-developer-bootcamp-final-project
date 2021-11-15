@@ -443,14 +443,6 @@ contract DecentralizedPools {
             "recipient is not registered in dPool"
         );
 
-        uint256 amt = IERC20(dPool.tokenAddress).allowance(
-            address(this),
-            msg.sender
-        );
-        emit Logger("allowance to send tokens", address(this), msg.sender, amt);
-        if (amount > 0) {
-            return false;
-        }
         uint256 cBalance = balanceOf(dpId, msg.sender);
 
         require(cBalance >= amount, "requested higher amount than remains");

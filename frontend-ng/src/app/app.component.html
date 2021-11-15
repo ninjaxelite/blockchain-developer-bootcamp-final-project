@@ -79,7 +79,7 @@
               <div style="margin-bottom: 15px;">
                 <button mat-raised-button class="add-recipient" [disabled]="disableAddRecipientBtn()"
                   (click)="addRecipient()">Add recipient</button>
-                <mat-form-field style="font-size: 14px;width: 345px;" appearance="fill">
+                <mat-form-field style="font-size: 14px;width: 360px;" appearance="fill">
                   <mat-label>recipient address</mat-label>
                   <input matInput placeholder="0x012345..." name="recip" [(ngModel)]="recipientAddress">
                 </mat-form-field>
@@ -120,7 +120,7 @@
       <div class="center">
         <div class="container">
           <div class="row">
-            <div *ngFor="let rdp of recipientDPools" class="col-sm-6" style="margin-bottom: 15px;">
+            <div *ngFor="let rdp of recipientDPools" class="col-sm-4" style="margin-bottom: 15px;">
               <app-receptor [dPool]="rdp"></app-receptor>
             </div>
           </div>
@@ -139,7 +139,7 @@
     <p class="center">Do you like Decentralized Pools and want to contribute with new ideas?</p>
     <p class="center">Contact me on Instagram
       <a href="https://www.instagram.com/crypto.maga/" target="_blank" style="text-decoration: none;color: #462d2d;">
-        <img class="metamask-icon" style="margin-right: 3px;margin-bottom: 12px;" src="assets/insta.png" />
+        <img class="insta-icon" style="margin-right: 3px;margin-bottom: 12px;" src="assets/insta.png" />
         <strong>crypto.maga</strong>.
       </a>
     </p>

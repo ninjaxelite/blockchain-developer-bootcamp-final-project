@@ -7,6 +7,7 @@
         "compile": "truffle compile",
         "test": "echo \"Error: no test specified\" && exit 1",
         "build": "truffle build && copy build\\contracts\\DecentralizedPools.json frontend-ng\\src\\contract",
+        "deploy": "truffle migrate --network rinkeby",
         "start-debugger": "truffle run debug start"
     },
     "author": "Magomed Arsaev",

@@ -1,3 +1,6 @@
+import contractaddress_prod from '../contract/contractaddress_prod.json';
+
 export const environment = {
-  production: true
+  production: true,
+  dPoolContract: contractaddress_prod.contract
 };
