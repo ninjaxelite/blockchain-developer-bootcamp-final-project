@@ -10,7 +10,7 @@ import "./Stream.sol";
 import "./utils/DPoolUtil.sol";
 
 /*
- * Extended Streaming protocol
+ * Extended Crypto distribution protocol
  */
 contract DecentralizedPools is Pausable, Ownable {
     // -- derived from Pausable
@@ -103,23 +103,39 @@ contract DecentralizedPools is Pausable, Ownable {
 
     constructor() {}
 
+    /*
+     * @notice Shutdown DPool creation.
+     */
     function emergencySwitchOn() public onlyOwner {
         _pause();
     }
 
+    /*
+     * @notice Activate DPool creation.
+     */
     function emergencySwitchOff() public onlyOwner {
         _unpause();
     }
 
+    /*
+     * @notice Get all dPoolIds by recipient msg address.
+     */
     function getRecipientDPoolIds() external view returns (uint256[] memory) {
         return recipientDPoolIds[msg.sender];
     }
 
+    /*
+     * @notice Get all dPoolIds by creator msg address.
+     */
     function getDPoolsCount() external view returns (uint256) {
         uint256[] memory _dPoolIds = dPoolIdsByCreator[msg.sender];
         return _dPoolIds.length;
     }
 
+    /*
+     * @notice Retrieve DPool by given index and the calling address.
+     * @param dPoolId
+     */
     function getDPool(uint256 index)
         external
         view
@@ -154,6 +170,10 @@ contract DecentralizedPools is Pausable, Ownable {
         );
     }
 
+    /*
+     * @notice Retrieve DPool by given id.
+     * @param dPoolId
+     */
     function getDPoolById(uint256 dPId)
         external
         view
@@ -188,8 +208,7 @@ contract DecentralizedPools is Pausable, Ownable {
     }
 
     /*
-     * @notice Creates a DPool that starts automatically calculating rates per second
-     *  when startTime is reached.
+     * @notice Creates a DPool with ETH.
      */
     function createEthDPool(
         string calldata dPoolName,
@@ -216,7 +235,7 @@ contract DecentralizedPools is Pausable, Ownable {
     }
 
     /*
-     * @notice Creates a DPool with a manual starter switch before calculating rates per second.
+     * @notice Creates a DPool with tokens.
      */
     function createTokenDPool(
         string calldata dPoolName,

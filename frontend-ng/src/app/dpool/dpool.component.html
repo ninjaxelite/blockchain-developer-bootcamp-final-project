@@ -1,11 +1,23 @@
 <div class="card dpool">
-    <div class="dpool-header">
+    <div class="dpool-header wrapper">
         <svg width="55" class="center" [data-jdenticon-value]="jdValue"></svg>
         <div class="abs-btn-del">
-            <button mat-mini-fab color="warn" aria-label="Delete DPool" (click)="deleteDPool()">
+            <button mat-mini-fab color="warn" aria-label="Delete DPool" (click)="deleteDPool()" disabled>
                 <mat-icon>delete</mat-icon>
             </button>
         </div>
+        <ul class="bg-bubbles">
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+        </ul>
     </div>
     <div class="card-details center" style="padding: 10px;">
         <table cellspacing="0" cellpadding="0">

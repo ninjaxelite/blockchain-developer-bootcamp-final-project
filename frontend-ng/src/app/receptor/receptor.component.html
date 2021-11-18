@@ -13,9 +13,11 @@
         font-weight: 500;">Start time: {{startTime}}</p>
         <p class="card-text center" style="font-size: 17px;
         font-weight: 500;">Stop time: {{stopTime}}</p>
-        <button mat-fab class="center mt-3 rotate" color="primary" (click)="withdraw()"
-            matTooltip="Withdraw amount to selected account">
+        <button *ngIf="!stopTimeReached" mat-fab class="center mt-3 rotate" color="primary" (click)="withdraw()"
+            matTooltip="Withdraw amount to logged in account">
             <mat-icon>exit_to_app</mat-icon>
         </button>
+        <p *ngIf="stopTimeReached" class="card-text center" style="font-size: 17px;
+        font-weight: 500;padding-top: 10px;">DPool drained</p>
     </div>
 </div>

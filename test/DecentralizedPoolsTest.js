@@ -40,30 +40,9 @@ contract("DecentralizedPools", function (accounts) {
 
     describe("handle dPools", () => {
 
-        const logger = (logs) => {
-            console.log('===============================================================');
-            for (i = 0; i < logs.length; i++) {
-                if (logs[i].event == 'Logger') {
-                    let ar = logs[i].args;
-                    console.log(ar['txt']);
-                    console.log(ar['sender']);
-                    console.log(ar['spender']);
-                    console.log(new BN(ar['l']).toString());
-                }
-            }
-            console.log('===============================================================');
-        };
-
         let startTime;
         let stopTime;
         let recipients;
-
-        const createTokenDPool = async (poolCreator, deposit) => {
-            let tokens = web3.utils.toWei(new BN(deposit), 'ether');
-            await tToken.approve(dPool.address, tokens, { from: poolCreator });
-            return tx = await dPool.createTokenDPool("testPool", recipients, deposit, tToken.address, startTime, stopTime,
-                { from: poolCreator });
-        }
 
         beforeEach(() => {
             recipients = [bob, mark, maga, goku];
@@ -72,50 +51,8 @@ contract("DecentralizedPools", function (accounts) {
             date.setDate(date.getDate() + 2); // add 2 day
             stopTime = date.getTime();
         });
-        /*
-                it("should withdraw creator tokens from dPool", async () => {
-                    const depositAmount = 3500;
-                    const tokenTX = await createTokenDPool(milo, depositAmount);
-                    const dPoolId = tokenTX.logs[0].args['dpId'];
-        
-                    console.log("pool startTime: " + tokenTX.logs[0].args['startTime']);
-        
-                    let blockNum = await web3.eth.getBlockNumber();
-                    let block = await web3.eth.getBlock(blockNum);
-                    currentBlockTS = block['timestamp'];
-                    console.log("block time: " + currentBlockTS);
-        
-                    await time.increase(307300044);
-        
-                    blockNum = await web3.eth.getBlockNumber();
-                    block = await web3.eth.getBlock(blockNum);
-                    currentBlockTS = block['timestamp'];
-                    console.log("block time after: " + currentBlockTS);
-        
-                    const withdrawAmount = await dPool.balanceOf(dPoolId, milo);
-                    const dPoolBalance = await tToken.balanceOf.call(dPool.address);
-                    console.log("withdraw amount: " + withdrawAmount);
-                    console.log("dPool balance: " + dPoolBalance);
-        
-                    console.log("dPool address: " + dPool.address);
-        
-                    let addr = dPool.address;
-                    await tToken.approve(milo, withdrawAmount, { from: addr });
-                    const txA = await tToken.allowance(addr, milo);
-                    console.log(new BN(txA).toString());
-                    const tx = await dPool.withdrawFromDPool(dPoolId, withdrawAmount, { from: milo });
-                    logger(tx.logs);
-                    
-                                const evt = tx.logs[0];
-                    
-                                console.log("remain: " + evt.args['remainingBalance']);
-                    
-                                assert.equal("WithdrawFromDPool", evt.event);
-                                assert.equal(depositAmount - new BN(withdrawAmount), evt.args['remainingBalance']);
-                });
-        */
-        it("should create a dPool containing given tokens", async () => {
 
+        it("should create a dPool containing given tokens", async () => {
             const approved = await tToken.approve(dPool.address, 90000, { from: milo });
             assert.equal(90000, new BN(approved.logs[0].args['value']));
 
@@ -127,7 +64,7 @@ contract("DecentralizedPools", function (accounts) {
             assert.equal(300, ev.args['deposit']);
             assert.equal(4, ev.args['recipients'].length);
         });
-        /*
+
         it("should create dPool containing given ether", async () => {
             const tx = await dPool.createEthDPool("testPool", recipients, startTime, stopTime,
                 { from: milo, value: 1e+18 });
@@ -137,7 +74,24 @@ contract("DecentralizedPools", function (accounts) {
             assert.equal(1, web3.utils.fromWei(ev.args['deposit'], 'ether'));
             assert.equal(4, ev.args['recipients'].length);
         });
-*/
+
+        it("should withdraw recipient ethers", async () => {
+            const tx = await dPool.createEthDPool("testPool", recipients, startTime, stopTime,
+                { from: milo, value: 1e+18 });
+            const ev = tx.logs[0];
+            const dpId = ev.args['dpId'];
+
+            await time.increase(100000000);
+            const balance = await dPool.balanceOf(dpId, bob);
+            const recipientTX = await dPool.withdrawFromDPool(dpId, balance, { from: bob });
+            const withdrawLogs = recipientTX.logs[0];
+
+            assert.equal("WithdrawFromDPool", withdrawLogs.event);
+            assert.equal(1, withdrawLogs.args['dpId']);
+            assert.equal(bob, withdrawLogs.args['receiver']);
+            assert.equal(balance, new BN(withdrawLogs.args['amount']).toString());
+        });
+
         it("should require recipients", async () => {
             let exc;
 

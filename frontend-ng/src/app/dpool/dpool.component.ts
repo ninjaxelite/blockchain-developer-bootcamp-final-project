@@ -26,8 +26,11 @@ export class DpoolComponent implements OnInit {
     } else {
       this.valueType = this.dPool.tokenName;
     }
+
+    this.jdValue = this.dPool.dPoolId;
   }
 
+  // TODO
   deleteDPool() {
     //this.dPoolService.deleteDPool
   }

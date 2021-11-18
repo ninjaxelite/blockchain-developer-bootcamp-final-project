@@ -8,7 +8,7 @@
 <div class="center">
   <span class="metamask-missing center" *ngIf="!selectedAccount">Please install
     <img class="metamask-icon" src="assets/metamask.png" />
-    MetaMask and switch to Kovan or Rinkeby
+    MetaMask and switch to Rinkeby
     Test-Network. After that refresh this page.</span>
 
   <div class="center" *ngIf="selectedAccount" style="margin-top: 5px;">
@@ -49,6 +49,9 @@
               </mat-radio-button>
               <mat-radio-button value="2" [disabled]="true">Token</mat-radio-button>
             </mat-radio-group>
+          </div>
+          <div style="padding-left: 37px;float: left;font-size: 20px;">
+            Your account balance: <b>{{accountBalance}}</b>
           </div>
           <div style="display: flex; justify-content: flex-end">
             <span class="recipient-del" (click)="closeForm()">x</span>

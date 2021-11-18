@@ -40,6 +40,7 @@ export class AppComponent implements OnInit {
   currentEthPrice;
 
   selectedAccount;
+  accountBalance;
   dPools: DPool[] = [];
   recipientDPools: DPool[] = [];
 
@@ -153,6 +154,7 @@ export class AppComponent implements OnInit {
       .then(response => {
         console.log(response);
         if (response) {
+          newDPool.dPoolId = "0";
           this.dPools.push(newDPool);
         }
       })
@@ -178,7 +180,8 @@ export class AppComponent implements OnInit {
     this.recipients.splice(this.recipients.indexOf(recipient), 1);
   }
 
-  showDPoolForm() {
+  async showDPoolForm() {
+    this.accountBalance = await this.dPoolService.getAccountBalance(this.selectedAccount);
     this.form.nativeElement.style = 'display: block';
     this.form.nativeElement.classList.add('myform');
   }

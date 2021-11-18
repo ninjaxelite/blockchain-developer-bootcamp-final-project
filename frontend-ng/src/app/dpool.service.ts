@@ -53,6 +53,12 @@ export class DpoolService {
     this.signer = this.provider.getSigner();
   }
 
+  public async getAccountBalance(address) {
+    const b = await this.provider.getBalance(address);
+    console.log(this.formatEth(this.getBNString(b)));
+    return this.formatEth(this.getBNString(b));
+  }
+
   public async getRecipientDPools(selectedAccount: string, currentEthPrice: number): Promise<DPool[]> {
     try {
       const dPoolIds: number[] = await this.dPoolsContract.getRecipientDPoolIds({ from: selectedAccount });
@@ -70,7 +76,7 @@ export class DpoolService {
       const receptorBalance = await this.dPoolsContract.balanceOf(dPoolIds[i], selectedAccount);
       const tokenName = this.getTokenName();
       const myDPool: DPool = this.convertToDPoolObject(dPool, currentEthPrice, tokenName);
-      myDPool.receptorBalance = ethers.utils.parseEther(this.getBNString(receptorBalance));
+      myDPool.receptorBalance = this.parseEther(receptorBalance);
       myDPool.receptorBalanceInETH = +this.formatEth(receptorBalance);
       dPools.push(myDPool);
     }
@@ -149,6 +155,10 @@ export class DpoolService {
       stopTime: +this.getBNString(_dPool[9]) * 1000,
       type: +this.getBNString(_dPool[10]),
     } as unknown as DPool;
+  }
+
+  public parseEther(val) {
+    return ethers.utils.parseEther(this.getBNString(val));
   }
 
   private getTokenName() {

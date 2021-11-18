@@ -27,6 +27,13 @@ export class ReceptorComponent implements OnInit {
     if (receptorBalance > 0) {
       await this.dPoolService.withdrawFromDPool(this.dPool.dPoolId, receptorBalance);
     }
+    receptorBalance = await this.dPoolService.dPoolsContract
+      .balanceOf(this.dPool.dPoolId, selectedAccount);
+    this.dPool.receptorBalanceInETH = +this.dPoolService.formatEth(receptorBalance);
+  }
+
+  get stopTimeReached(): boolean {
+    return this.dPool.stopTime < (new Date().getTime()) ? true : false;
   }
 
   get balance() {
