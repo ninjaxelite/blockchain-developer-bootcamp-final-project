@@ -15,7 +15,7 @@ export const MY_FORMATS = {
     dateInput: 'l, LTS',
   },
   display: {
-    dateInput: 'DD-MM-YYYY hh:mm',
+    dateInput: 'DD-MM-YYYY',
     monthYearLabel: 'YYYY',
     dateA11yLabel: 'LL',
     monthYearA11yLabel: 'YYYY',
@@ -87,6 +87,7 @@ export class AppComponent implements OnInit {
     }
 
     this.loading = true;
+    this.dPoolService.setEthPrice(this.currentEthPrice);
     await this.dPoolService.initWeb3();
     this.disableStartAppBtn = false;
     this.selectedAccount = await this.dPoolService.listAccounts();

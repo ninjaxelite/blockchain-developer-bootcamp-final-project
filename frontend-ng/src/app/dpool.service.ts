@@ -17,9 +17,15 @@ export class DpoolService {
   signer;
   dPoolsContract;
 
+  ethPrice;
+
   errorSubject = new Subject<string>();
 
   constructor(private httpClient: HttpClient) { }
+
+  public setEthPrice(p) {
+    this.ethPrice = p;
+  }
 
   public async listAccounts() {
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
@@ -64,7 +70,8 @@ export class DpoolService {
       const receptorBalance = await this.dPoolsContract.balanceOf(dPoolIds[i], selectedAccount);
       const tokenName = this.getTokenName();
       const myDPool: DPool = this.convertToDPoolObject(dPool, currentEthPrice, tokenName);
-      myDPool.receptorBalance = receptorBalance;
+      myDPool.receptorBalance = ethers.utils.parseEther(this.getBNString(receptorBalance));
+      myDPool.receptorBalanceInETH = +this.formatEth(receptorBalance);
       dPools.push(myDPool);
     }
     return dPools;
@@ -112,7 +119,8 @@ export class DpoolService {
   public async withdrawFromDPool(dpId: string, amount: number) {
     try {
       const options = {
-        from: await this.listAccounts()
+        from: await this.listAccounts(),
+        nonce: 0
       };
       const unsignedTx = await this.dPoolsContract.populateTransaction
         .withdrawFromDPool(dpId, amount, options);
@@ -148,12 +156,16 @@ export class DpoolService {
     return 'TRX';
   }
 
-  private getBNString(val): string {
+  public getBNString(val): string {
     return ethers.BigNumber.from(val).toString();
   }
 
   public formatEth(val) {
     return ethers.utils.formatEther(val);
+  }
+
+  public getEthInWei(val): string {
+    return ethers.utils.formatUnits(val, 0);
   }
 
   copyToCB(account) {

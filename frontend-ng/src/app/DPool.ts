@@ -13,6 +13,7 @@ export class DPool {
     stopTime: number;
     type: number;
 
-    receptorBalance: number;
+    receptorBalance: string;
+    receptorBalanceInETH: number;
 }
 

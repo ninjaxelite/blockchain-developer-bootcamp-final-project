@@ -113,100 +113,94 @@ contract("DecentralizedPools", function (accounts) {
                                 assert.equal("WithdrawFromDPool", evt.event);
                                 assert.equal(depositAmount - new BN(withdrawAmount), evt.args['remainingBalance']);
                 });
-        
-                it("should create a dPool containing given tokens", async () => {
-        
-                    const approved = await tToken.approve(dPool.address, 90000, { from: milo });
-                    assert.equal(90000, new BN(approved.logs[0].args['value']));
-        
-                    const tx = await dPool.createTokenDPool("testPool", recipients, 300, tToken.address, startTime, stopTime,
-                        { from: milo });
-                    const ev = tx.logs[0];
-        
-                    assert.equal("CreateDPool", ev.event);
-                    assert.equal(300, ev.args['deposit']);
-                    assert.equal(4, ev.args['recipients'].length);
-                    assert.equal(1736111111111, new BN(ev.args['ratePerSecond']).toString());
-                });
         */
+        it("should create a dPool containing given tokens", async () => {
+
+            const approved = await tToken.approve(dPool.address, 90000, { from: milo });
+            assert.equal(90000, new BN(approved.logs[0].args['value']));
+
+            const tx = await dPool.createTokenDPool("testPool", recipients, 300, tToken.address, startTime, stopTime,
+                { from: milo });
+            const ev = tx.logs[0];
+
+            assert.equal("CreateDPool", ev.event);
+            assert.equal(300, ev.args['deposit']);
+            assert.equal(4, ev.args['recipients'].length);
+        });
+        /*
         it("should create dPool containing given ether", async () => {
-            const tx = await debug(dPool.createEthDPool("testPool", recipients, startTime, stopTime,
-                { from: milo, value: 1e+18 }));
+            const tx = await dPool.createEthDPool("testPool", recipients, startTime, stopTime,
+                { from: milo, value: 1e+18 });
             const ev = tx.logs[0];
 
             assert.equal("CreateDPool", ev.event);
             assert.equal(1, web3.utils.fromWei(ev.args['deposit'], 'ether'));
             assert.equal(4, ev.args['recipients'].length);
-            assert.equal(11574074074, new BN(ev.args['ratePerSecond']).toString());
         });
-        /*
-                it("should require recipients", async () => {
-                    let exc;
-        
-                    await dPool.createEthDPool("testPool", [], startTime, stopTime, { from: milo, value: 2e+18 })
-                        .catch(e => exc = e.reason);
-        
-                    assert.equal('there should be at least one recipient', exc);
-                });
-        
-                it("should have deposit greater 0", async () => {
-                    let exc;
-        
-                    await dPool.createEthDPool("testPool", recipients, startTime, stopTime, { from: milo, value: 0 })
-                        .catch(e => exc = e.reason);
-        
-                    assert.equal('deposit should be greater than 0', exc);
-                });
-        
-                it("should have startTime after block.timestamp", async () => {
-                    const dateL = new Date(date.getTime());
-                    dateL.setDate(dateL.getDate() - 10);
-        
-                    const startTime = dateL.getTime();
-                    let exc;
-        
-                    await dPool.createEthDPool("testPool", recipients, startTime, stopTime, { from: milo, value: 2e+18 })
-                        .catch(e => exc = e.reason);
-        
-                    assert.equal('start time should be after block.timestamp', exc);
-                });
-        
-                it("should have stopTime after startTime", async () => {
-                    let exc;
-                    const stopTime = startTime - 100;
-        
-                    await dPool.createEthDPool("testPool", recipients, startTime, stopTime, { from: milo, value: 2e+18 })
-                        .catch(e => exc = e.reason);
-        
-                    assert.equal('stopTime should be greater than startTime', exc);
-                });
-        
-                it("should have a valid recipient address", async () => {
-                    let exc;
-        
-                    await dPool.createEthDPool("testPool", [emptyAddress], startTime, stopTime, { from: milo, value: 2e+18 })
-                        .catch(e => exc = e.reason);
-        
-                    assert.equal('no recipient address provided', exc);
-                });
-        
-                it("should not have contract address as recipient", async () => {
-                    let exc;
-        
-                    await dPool.createEthDPool("testPool", [dPool.address], startTime, stopTime, { from: milo, value: 2e+18 })
-                        .catch(e => exc = e.reason);
-        
-                    assert.equal('recipient should not be this contract', exc);
-                });
-        
-                it("should not have sender as recipient", async () => {
-                    let exc;
-        
-                    await dPool.createEthDPool("testPool", [milo], startTime, stopTime, { from: milo, value: 2e+18 })
-                        .catch(e => exc = e.reason);
-        
-                    assert.equal('recipient should not be sender', exc);
-                });*/
+*/
+        it("should require recipients", async () => {
+            let exc;
 
+            await dPool.createEthDPool("testPool", [], startTime, stopTime, { from: milo, value: 1e+18 })
+                .catch(e => exc = e.reason);
+
+            assert.equal('there should be at least one recipient', exc);
+        });
+
+        it("should have deposit greater 0", async () => {
+            let exc;
+
+            await dPool.createEthDPool("testPool", recipients, startTime, stopTime, { from: milo, value: 0 })
+                .catch(e => exc = e.reason);
+
+            assert.equal('deposit should be greater than 0', exc);
+        });
+
+        it("should have startTime after block.timestamp", async () => {
+            const startTime = currentBlockTS - 100000000;
+            let exc;
+
+            await dPool.createEthDPool("testPool", recipients, startTime, stopTime, { from: milo, value: 1e+18 })
+                .catch(e => exc = e.reason);
+
+            assert.equal('start time should be after block.timestamp', exc);
+        });
+
+        it("should have stopTime after startTime", async () => {
+            let exc;
+            const stopTime = startTime - 100;
+
+            await dPool.createEthDPool("testPool", recipients, startTime, stopTime, { from: milo, value: 1e+18 })
+                .catch(e => exc = e.reason);
+
+            assert.equal('stopTime should be greater than startTime', exc);
+        });
+
+        it("should have a valid recipient address", async () => {
+            let exc;
+
+            await dPool.createEthDPool("testPool", [emptyAddress], startTime, stopTime, { from: milo, value: 1e+18 })
+                .catch(e => exc = e.reason);
+
+            assert.equal('no recipient address provided', exc);
+        });
+
+        it("should not have contract address as recipient", async () => {
+            let exc;
+
+            await dPool.createEthDPool("testPool", [dPool.address], startTime, stopTime, { from: milo, value: 1e+18 })
+                .catch(e => exc = e.reason);
+
+            assert.equal('recipient should not be this contract', exc);
+        });
+
+        it("should not have sender as recipient", async () => {
+            let exc;
+
+            await dPool.createEthDPool("testPool", [milo], startTime, stopTime, { from: milo, value: 1e+18 })
+                .catch(e => exc = e.reason);
+
+            assert.equal('recipient should not be sender', exc);
+        });
     });
 });

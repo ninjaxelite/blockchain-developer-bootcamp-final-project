@@ -44,8 +44,6 @@ library DPoolUtil {
         );
         require(substracted, "stopTime is greater than startTime");
 
-        require(_deposit > duration, "deposit must be greater than duration");
-
         (bool divided, uint256 _ratePerSecond) = SafeMath.tryDiv(
             _deposit,
             duration

@@ -4,6 +4,7 @@ pragma solidity 0.8.0;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 
 import "./Stream.sol";
 import "./utils/DPoolUtil.sol";
@@ -11,11 +12,9 @@ import "./utils/DPoolUtil.sol";
 /*
  * Extended Streaming protocol
  */
-contract DecentralizedPools {
-    // --
-
-    // contract owner
-    address public owner;
+contract DecentralizedPools is Pausable, Ownable {
+    // -- derived from Pausable
+    // emergency switch
 
     event CreateDPool(
         uint256 dpId,
@@ -55,17 +54,21 @@ contract DecentralizedPools {
     // get all pool ids by creator
     mapping(address => uint256[]) dPoolIdsByCreator;
 
-    // every recipient address by dPoolId
+    // map every existing recipient address by dPoolId
     mapping(address => mapping(uint256 => bool)) recipientsByDPoolId;
+
     // get dPool ids by recipient
     mapping(address => uint256[]) recipientDPoolIds;
+
+    // every recipient has a withdrawnAmount
+    mapping(address => uint256) recipientWithdrawnAmount;
 
     // ident of every new dPool
     uint256 dPoolIdCounter = 1;
 
     // validates inputs for new dPool
     modifier validateInput(
-        address[] memory recipients,
+        address[] calldata recipients,
         uint256 deposit,
         uint256 startTime,
         uint256 stopTime
@@ -87,28 +90,25 @@ contract DecentralizedPools {
     }
 
     // validates and stores recipients in mapping
-    modifier validateAndMapRecipients(address[] memory recipients) {
+    modifier validateRecipients(address[] calldata recipients) {
         for (uint256 i = 0; i < recipients.length; i++) {
             DPoolUtil.validateRecipient(
                 recipients[i],
                 address(this),
                 msg.sender
             );
-
-            /*
-            TODO Use modifiers only for checks - 
-            move to function
-            */
-            // map recipients by dPoolId for convinient access
-            recipientsByDPoolId[recipients[i]][dPoolIdCounter] = true;
-            uint256[] storage dPIds = recipientDPoolIds[recipients[i]];
-            dPIds.push(dPoolIdCounter);
         }
         _;
     }
 
-    constructor() {
-        owner = msg.sender;
+    constructor() {}
+
+    function emergencySwitchOn() public onlyOwner {
+        _pause();
+    }
+
+    function emergencySwitchOff() public onlyOwner {
+        _unpause();
     }
 
     function getRecipientDPoolIds() external view returns (uint256[] memory) {
@@ -199,6 +199,7 @@ contract DecentralizedPools {
     )
         public
         payable
+        whenNotPaused
         validateInput(recipients, msg.value, startTime, stopTime)
         returns (uint256)
     {
@@ -227,6 +228,7 @@ contract DecentralizedPools {
     )
         public
         payable
+        whenNotPaused
         validateInput(recipients, deposit, startTime, stopTime)
         returns (uint256)
     {
@@ -234,7 +236,7 @@ contract DecentralizedPools {
             createDPool(
                 dPoolName,
                 recipients,
-                toWei(deposit),
+                deposit,
                 tokenAddress,
                 startTime,
                 stopTime,
@@ -260,7 +262,8 @@ contract DecentralizedPools {
         uint256 _startTime,
         uint256 _stopTime,
         uint256 _type
-    ) internal validateAndMapRecipients(_recipients) returns (uint256) {
+    ) internal validateRecipients(_recipients) returns (uint256) {
+        mapRecipients(_recipients);
         uint256 _ratePerSecond = DPoolUtil.calculateRPS(
             _deposit,
             _startTime,
@@ -303,13 +306,10 @@ contract DecentralizedPools {
 
     // save given dPool on chain and map dPoolId
     function saveDPool(Stream.DPool memory dPool) private {
-        registerDPoolIdsToRecipients(dPool);
         dPools[dPool.dPoolId] = dPool;
         uint256[] storage creatorPoolIds = dPoolIdsByCreator[msg.sender];
         creatorPoolIds.push(dPool.dPoolId);
     }
-
-    function registerDPoolIdsToRecipients(Stream.DPool memory dPool) private {}
 
     // transfers tokens to contract
     function transferTokens(
@@ -395,6 +395,39 @@ contract DecentralizedPools {
             return 0;
         }
 
+        (bool currentResult, uint256 individualRecipientBalance) = SafeMath
+            .tryDiv(totalRecipientBalance, dPool.recipients.length);
+        require(currentResult, "balanceOf division not possible");
+
+        uint256 receptorWithdrawnAmount = recipientWithdrawnAmount[requester];
+
+        if (receptorWithdrawnAmount > 0) {
+            (bool withdrawResult, uint256 withdrawn) = SafeMath.trySub(
+                dPool.deposit,
+                dPool.remainingBalance
+            );
+            require(withdrawResult, "problem with withdraw result");
+            if (requester == dPool.creator) {
+                (
+                    bool exactResultCreator,
+                    uint256 exactRemainsCreator
+                ) = SafeMath.trySub(totalRecipientBalance, withdrawn);
+                require(exactResultCreator, "problem with creators result");
+                totalRecipientBalance = exactRemainsCreator;
+            } else {
+                (bool exactResult, uint256 exactRemains) = SafeMath.trySub(
+                    individualRecipientBalance,
+                    withdrawn
+                );
+                require(exactResult, "problem with receptors exact result");
+                individualRecipientBalance = exactRemains;
+            }
+        }
+
+        if (recipientsByDPoolId[requester][dPool.dPoolId]) {
+            return individualRecipientBalance;
+        }
+
         if (requester == dPool.creator) {
             (bool senderResult, uint256 senderBalance) = SafeMath.trySub(
                 dPool.remainingBalance,
@@ -403,14 +436,6 @@ contract DecentralizedPools {
             require(senderResult, "balanceOf substraction issue");
 
             return senderBalance;
-        }
-
-        (bool currentResult, uint256 individualRecipientBalance) = SafeMath
-            .tryDiv(totalRecipientBalance, dPool.recipients.length);
-        require(currentResult, "balanceOf division not possible");
-
-        if (recipientsByDPoolId[requester][dPool.dPoolId]) {
-            return individualRecipientBalance;
         }
 
         return 0;
@@ -456,6 +481,9 @@ contract DecentralizedPools {
         dPool.remainingBalance = newRemainingBalance;
 
         withdrawFromContract(dPool.tokenAddress, dPool.dVType, amount, amount);
+
+        uint256 receptorWithdrawnAmount = recipientWithdrawnAmount[msg.sender];
+        recipientWithdrawnAmount[msg.sender] = receptorWithdrawnAmount + amount;
 
         if (dPool.remainingBalance == 0) {
             delete dPools[dpId];
@@ -559,8 +587,13 @@ contract DecentralizedPools {
         }
     }
 
-    function toWei(uint256 balance) internal pure returns (uint256) {
-        return balance * 10**18;
+    // maps given recipients by dPoolId
+    function mapRecipients(address[] calldata recipients) internal {
+        for (uint256 i = 0; i < recipients.length; i++) {
+            recipientsByDPoolId[recipients[i]][dPoolIdCounter] = true;
+            uint256[] storage dPIds = recipientDPoolIds[recipients[i]];
+            dPIds.push(dPoolIdCounter);
+        }
     }
 
     fallback() external payable {}

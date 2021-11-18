@@ -21,18 +21,16 @@ export class ReceptorComponent implements OnInit {
 
   public async withdraw() {
     const selectedAccount = await this.dPoolService.listAccounts();
-    const receptorBalance = await this.dPoolService.dPoolsContract
+    let receptorBalance = await this.dPoolService.dPoolsContract
       .balanceOf(this.dPool.dPoolId, selectedAccount);
-    console.log('balance: ');
-    console.log(this.dPoolService.formatEth(receptorBalance));
+    receptorBalance = this.dPoolService.getEthInWei(receptorBalance).toString();
     if (receptorBalance > 0) {
-      await this.dPoolService.withdrawFromDPool(this.dPool.dPoolId,
-        this.dPoolService.formatEth(receptorBalance));
+      await this.dPoolService.withdrawFromDPool(this.dPool.dPoolId, receptorBalance);
     }
   }
 
   get balance() {
-    return this.dPool.receptorBalance;
+    return this.truncate(new String(this.dPool.receptorBalanceInETH), 9);
   }
 
   get valueName() {
@@ -40,7 +38,7 @@ export class ReceptorComponent implements OnInit {
   }
 
   get devaluatedAmount() {
-    return this.devaluate(this.dPool.receptorBalance);
+    return this.devaluate(this.dPool.receptorBalanceInETH * this.dPoolService.ethPrice);
   }
 
   get startTime() {
@@ -50,6 +48,10 @@ export class ReceptorComponent implements OnInit {
   get stopTime() {
     return (moment(new Date(this.dPool.stopTime))).format('DD.MM.yyyy hh:mm:ss');
   }
+
+  truncate(str, n) {
+    return (str.length > n) ? str.substr(0, n - 1) : str;
+  };
 
   devaluate(num) {
     return new Intl.NumberFormat(`en-US`, {
