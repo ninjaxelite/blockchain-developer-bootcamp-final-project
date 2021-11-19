@@ -32,14 +32,15 @@ youtube
 
 ### Setup
 - #### Frontend
- - Navigate to frontend-ng folder in '*blockchain-developer-bootcamp-final-project*:'
+ -- Navigate to frontend-ng folder in '*blockchain-developer-bootcamp-final-project*:'
  `cd frontend-ng`
  
- - Install all Angular project dependencies:
+ -- Install all Angular project dependencies:
 `npm install --save`
 
- - And spin up frontend:
+ -- And spin up frontend:
 `ng serve --open`
+
 - #### Ganache
  - Go to the main folder '*blockchain-developer-bootcamp-final-project*:'
 `cd blockchain-developer-bootcamp-final-project`
