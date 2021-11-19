@@ -35,43 +35,40 @@ youtube
   - Navigate to frontend-ng folder in '*blockchain-developer-bootcamp-final-project*:'<br/>
     `cd frontend-ng`
  
-  - Install all Angular project dependencies:
+  - Install all Angular project dependencies:<br/>
     `npm install --save`
 
-  - And spin up frontend:
+  - And spin up frontend:<br/>
     `ng serve --open`
 
 - #### Ganache
-  - Go to the main folder '*blockchain-developer-bootcamp-final-project*:'
+  - Go to the main folder '*blockchain-developer-bootcamp-final-project*:'<br/>
     `cd blockchain-developer-bootcamp-final-project`
 
-  - Run Ganache on port 7545:
+  - Run Ganache on port 7545:<br/>
     `ganache-cli -p 7545`
 
-  - Build the contract and move the *json* file to frontend-ng:
+  - Build the contract and move the *json* file to frontend-ng:<br/>
     `npm run build`
 
     --  If that does not work, you have to build and move json file on your own:
 
-     --- `truffle build` 
-     
-     and 
-          
-     --- `copy build\\contracts\\DecentralizedPools.json frontend-ng\\src\\contract` 
-
+     --- `truffle build` <br/>     
+     and           
+     --- `copy build\\contracts\\DecentralizedPools.json frontend-ng\\src\\contract` <br/>
      yeah I had to develop on windows :/
      
-  - Deploy contract locally:
+  - Deploy contract locally:<br/>
     `npm run deploy`
 
    **Thats it.**
 
-  - For contract Unit tests:
-`npm run test`
+  - For contract Unit tests:<br/>
+    `npm run test`
 Note: You need to have a freshly spun up blockchain because the unit tests change block timestamp.
 
-  - To deploy on Rinkeby:
-`npm run deploy-rinkeby`
+  - To deploy on Rinkeby:<br/>
+    `npm run deploy-rinkeby`
 
 ------------
 ### Things to improve
