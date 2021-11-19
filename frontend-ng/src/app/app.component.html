@@ -51,7 +51,7 @@
             </mat-radio-group>
           </div>
           <div style="padding-left: 37px;float: left;font-size: 20px;">
-            Your account balance: <b>{{accountBalance}}</b>
+            Your account balance: <b>{{accountBalance}} ETH</b>
           </div>
           <div style="display: flex; justify-content: flex-end">
             <span class="recipient-del" (click)="closeForm()">x</span>
@@ -103,7 +103,7 @@
 
         <mat-divider style="margin-top: 15px;margin-bottom:15px;"></mat-divider>
 
-        <span *ngIf="dPools.length === 0">No DPools exist for logged in user</span>
+        <span *ngIf="dPools.length === 0" style="font-size: 20px;">No DPools exist for logged in user</span>
 
         <div class="container">
           <div class="row">
@@ -119,6 +119,10 @@
 
     <!-- Joined DPools -->
     <mat-tab label="Participating DPools">
+
+      <mat-divider style="margin-top: 10px;margin-bottom:10px;color:white;border-color: white;"></mat-divider>
+      <span *ngIf="recipientDPools.length === 0" style="font-size: 20px;">User is not participating in any
+        DPools.</span>
 
       <div class="center">
         <div class="container">

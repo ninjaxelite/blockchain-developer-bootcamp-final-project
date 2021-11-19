@@ -80,14 +80,15 @@ contract("DecentralizedPools", function (accounts) {
                 { from: milo, value: 1e+18 });
             const ev = tx.logs[0];
             const dpId = ev.args['dpId'];
+            const forwardTo = startTime - currentBlockTS + 60 * 120;
 
-            await time.increase(100000000);
+            await time.increase(forwardTo);
+
             const balance = await dPool.balanceOf(dpId, bob);
             const recipientTX = await dPool.withdrawFromDPool(dpId, balance, { from: bob });
             const withdrawLogs = recipientTX.logs[0];
 
             assert.equal("WithdrawFromDPool", withdrawLogs.event);
-            assert.equal(1, withdrawLogs.args['dpId']);
             assert.equal(bob, withdrawLogs.args['receiver']);
             assert.equal(balance, new BN(withdrawLogs.args['amount']).toString());
         });
