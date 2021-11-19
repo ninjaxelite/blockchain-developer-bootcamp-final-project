@@ -50,9 +50,14 @@ youtube
 
   - Build the contract and move the *json* file to frontend-ng:
 `npm run build`
---  If that somehow does not work, you have to build and move json file on your own:
+
+--  If that does not work, you have to build and move json file on your own:
+
 --- `truffle build` and 
---- `copy build\\contracts\\DecentralizedPools.json frontend-ng\\src\\contract` yeah I had to develop on windows :/
+
+--- `copy build\\contracts\\DecentralizedPools.json frontend-ng\\src\\contract` 
+
+yeah I had to develop on windows :/
   - Deploy contract locally:
 `npm run deploy`
 
