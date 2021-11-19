@@ -5,7 +5,8 @@
 
 Stream either Ether or any other ERC20 Tokens to selected recipients of your choice. It is fairly easy and quick to create a DPool by giving a name, start and end date, amount that you want to distribute and the receptors. The distribution starts when the block timestamp reaches the start date of the DPool. Receivers can watch their accounts grow second by second and withdraw the available amount immediatly. The owner of this contract can lock or unlock new DPool creations by calling the contract methods `emergencySwitchOn()` or `emergencySwitchOff()`.
 
-One usecase maybe to distribute crypto to DAOs via DPools for selected projects in a specific time.
+One usecase maybe to distribute crypto to DAOs via DPools for selected projects in a specific time.<br/>
+
 To create a new DPool containing Ether call the contract method:<br/>
 `createEthDPool(
         string calldata dPoolName,
