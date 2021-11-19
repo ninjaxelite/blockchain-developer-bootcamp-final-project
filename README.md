@@ -9,7 +9,7 @@ One usecase maybe to distribute crypto to DAOs via DPools for selected projects 
 
 
 ------------
-####Visual testing
+###Visual testing
 1. Access website on https://dpools.subdomain.com
 *Contract is deployed on Rinkeby 0x...*
 2. Login to MetaMask and press the button *Start Applikation*.
