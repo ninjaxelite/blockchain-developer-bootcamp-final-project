@@ -7,7 +7,7 @@ Stream either Ether or any other ERC20 Tokens to selected recipients of your cho
 
 One usecase maybe to distribute crypto to DAOs via DPools for selected projects in a specific time.<br/>
 
-To create a new DPool containing Ether call the contract method:<br/>
+To create a new DPool containing Ether call the contract function:<br/>
 `createEthDPool(
         string calldata dPoolName,
         address[] calldata recipients,
@@ -15,8 +15,8 @@ To create a new DPool containing Ether call the contract method:<br/>
         uint256 stopTime
     )`
 <br/>
-If a participant wants to withdraw its fair share, simply call:<br/>
-`withdrawFromDPool(uint256 dpId, uint256 amount)`
+If a participant wants to withdraw its fair share, simply call following function with recipient address:<br/>
+`withdrawFromDPool( uint256 dpId, uint256 amount )`
 
 ------------
 ### Visual testing
