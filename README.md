@@ -9,7 +9,7 @@ One usecase maybe to distribute crypto to DAOs via DPools for selected projects 
 
 
 ------------
-###Visual testing
+### Visual testing
 1. Access website on https://dpools.subdomain.com
 *Contract is deployed on Rinkeby 0x...*
 2. Login to MetaMask and press the button *Start Applikation*.
@@ -24,13 +24,13 @@ youtube
 
 ------------
 
-###Prerequisites
+### Prerequisites
  - Angular CLI: 12.2.12
  - Node: 12.18.2
  - Package Manager: npm 6.8.0
  - Ganache CLI v6.12.2 (ganache-core: 2.13.2)
 
-###Setup
+### Setup
 - #### Frontend
  - Navigate to frontend-ng folder in '*blockchain-developer-bootcamp-final-project*:'
  `cd frontend-ng`
