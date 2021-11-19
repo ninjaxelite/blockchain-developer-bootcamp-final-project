@@ -3,10 +3,19 @@
 ## Decentralized Pools
 ##### My eth address for the nft certificate:  `0x2D80fD6fe6a3D38A2b0F86D2eE990bD24521BD96`
 
-Stream either Ether or any other ERC20 Tokens to selected recipients of your choice. It is fairly easy and quick to create a DPool by giving a name, start and end date, amount that you want to distribute and the receptors. The distribution starts when the block timestamp reaches the start date of the DPool. Receivers can watch their accounts grow second by second and withdraw the available amount immediatly.
+Stream either Ether or any other ERC20 Tokens to selected recipients of your choice. It is fairly easy and quick to create a DPool by giving a name, start and end date, amount that you want to distribute and the receptors. The distribution starts when the block timestamp reaches the start date of the DPool. Receivers can watch their accounts grow second by second and withdraw the available amount immediatly. The owner of this contract can lock or unlock new DPool creations by calling the contract methods `emergencySwitchOn()` or `emergencySwitchOff()`.
 
 One usecase maybe to distribute crypto to DAOs via DPools for selected projects in a specific time.
-
+To create a new DPool containing Ether call the contract method:<br/>
+`createEthDPool(
+        string calldata dPoolName,
+        address[] calldata recipients,
+        uint256 startTime,
+        uint256 stopTime
+    )`
+<br/>
+If a participant wants to withdraw its fair share, simply call:<br/>
+`withdrawFromDPool(uint256 dpId, uint256 amount)`
 
 ------------
 ### Visual testing
