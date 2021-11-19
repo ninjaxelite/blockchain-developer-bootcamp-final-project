@@ -33,6 +33,7 @@ youtube
 ### Setup
 - #### Frontend
   - Navigate to frontend-ng folder in '*blockchain-developer-bootcamp-final-project*:'
+  
     `cd frontend-ng`
  
   - Install all Angular project dependencies:
