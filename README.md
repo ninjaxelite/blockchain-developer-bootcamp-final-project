@@ -1,7 +1,7 @@
 ### blockchain-developer-bootcamp-final-project
 
 ## Decentralized Pools
-##### My eth address for the nft certificate:  0x2D80fD6fe6a3D38A2b0F86D2eE990bD24521BD96
+##### My eth address for the nft certificate:  `0x2D80fD6fe6a3D38A2b0F86D2eE990bD24521BD96`
 
 Stream either Ether or any other ERC20 Tokens to selected recipients of your choice. It is fairly easy and quick to create a DPool by giving a name, start and end date, amount that you want to distribute and the receptors. The distribution starts when the block timestamp reaches the start date of the DPool. Receivers can watch their accounts grow second by second and withdraw the available amount immediatly.
 
