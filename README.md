@@ -13,8 +13,8 @@ One usecase maybe to distribute crypto to DAOs via DPools for selected projects 
 1. Access website on https://dpools.subdomain.com
 *Contract is deployed on Rinkeby 0x...*
 2. Login to MetaMask and press the button *Start Applikation*.
-Make sure MetaMask is running on the local network on port 7545.
-![Start Applikation](https://ibb.co/RBrgB5s "Start Applikation")
+Make sure MetaMask is running on the local network on port 7545.<br/>
+![Start Applikation](https://ibb.co/RBrgB5s)
 
 3. After that you will see the main page.
 ![Main page](https://ibb.co/Y2FX26d "Main page")
