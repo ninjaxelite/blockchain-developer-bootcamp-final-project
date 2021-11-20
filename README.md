@@ -62,7 +62,7 @@ youtube
 
   - For contract Unit tests:<br/>
     `npm run test`
-Note: You need to have a freshly spun up blockchain because the unit tests change block timestamp.
+Note: You need to have a freshly spun up blockchain because the unit tests change the block timestamp. If you run the tests first, you have to deploy the contract again!!
 
   - To deploy on Rinkeby:<br/>
     `npm run deploy-rinkeby`
