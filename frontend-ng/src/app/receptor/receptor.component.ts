@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import * as moment from 'moment';
 import { DPool } from '../DPool';
 import { DpoolService } from '../dpool.service';
@@ -14,9 +14,16 @@ export class ReceptorComponent implements OnInit {
 
   @Input() dPool: DPool;
 
+  isWbtnDisabled = false;
+
   constructor(private dPoolService: DpoolService) { }
 
   ngOnInit(): void {
+    if (this.dPool.receptorBalanceInETH > 0) {
+      this.isWbtnDisabled = false;
+    } else {
+      this.isWbtnDisabled = true;
+    }
   }
 
   public async withdraw() {
@@ -27,9 +34,8 @@ export class ReceptorComponent implements OnInit {
     if (receptorBalance > 0) {
       await this.dPoolService.withdrawFromDPool(this.dPool.dPoolId, receptorBalance);
     }
-    receptorBalance = await this.dPoolService.dPoolsContract
-      .balanceOf(this.dPool.dPoolId, selectedAccount);
-    this.dPool.receptorBalanceInETH = +this.dPoolService.formatEth(receptorBalance);
+    this.dPool.receptorBalanceInETH = 0;
+    this.isWbtnDisabled = true;
   }
 
   get stopTimeReached(): boolean {
@@ -49,11 +55,11 @@ export class ReceptorComponent implements OnInit {
   }
 
   get startTime() {
-    return (moment(new Date(this.dPool.startTime))).format('DD.MM.yyyy hh:mm:ss');
+    return (moment(new Date(this.dPool.startTime))).format('DD.MM.yyyy hh:mm:ss A');
   }
 
   get stopTime() {
-    return (moment(new Date(this.dPool.stopTime))).format('DD.MM.yyyy hh:mm:ss');
+    return (moment(new Date(this.dPool.stopTime))).format('DD.MM.yyyy hh:mm:ss A');
   }
 
   truncate(str, n) {

@@ -34,7 +34,7 @@
   <mat-tab-group *ngIf="!loading && selectedAccount" style="margin-bottom: 135px;" class="mt-3" animationDuration="0ms">
 
     <!-- My DPools-->
-    <mat-tab label="My DPools">
+    <mat-tab label="({{dPools.length}}) My DPools">
 
       <div class="mt-3">
         <button mat-raised-button class="start-app" (click)="showDPoolForm()">
@@ -54,7 +54,7 @@
             Your account balance: <b>{{accountBalance}} ETH</b>
           </div>
           <div style="display: flex; justify-content: flex-end">
-            <span class="recipient-del" (click)="closeForm()">x</span>
+            <span class="recipient-del" (click)="closeForm2()">X</span>
           </div>
           <div style="margin-top: 15px;">
             <mat-form-field class="form-details" appearance="fill">
@@ -62,7 +62,7 @@
               <input matInput placeholder="sample DAO distribution" name="dpname" [(ngModel)]="dPoolName">
             </mat-form-field>
             <mat-form-field class="form-details" appearance="fill">
-              <mat-label>Deposit</mat-label>
+              <mat-label>Deposit in ETH</mat-label>
               <input matInput name="depo" [(ngModel)]="dPoolDeposit">
             </mat-form-field>
             <mat-form-field class="form-details" appearance="fill">
@@ -118,7 +118,7 @@
     </mat-tab>
 
     <!-- Joined DPools -->
-    <mat-tab label="Participating DPools">
+    <mat-tab label="({{recipientDPools.length}}) Participating DPools">
 
       <mat-divider style="margin-top: 10px;margin-bottom:10px;color:white;border-color: white;"></mat-divider>
       <span *ngIf="recipientDPools.length === 0" style="font-size: 20px;">User is not participating in any
@@ -127,7 +127,7 @@
       <div class="center">
         <div class="container">
           <div class="row">
-            <div *ngFor="let rdp of recipientDPools" class="col-sm-4" style="margin-bottom: 15px;">
+            <div *ngFor="let rdp of recipientDPools" class="col-md-4" style="margin-bottom: 15px;min-width: 19rem;">
               <app-receptor [dPool]="rdp"></app-receptor>
             </div>
           </div>

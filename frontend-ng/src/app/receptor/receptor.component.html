@@ -9,12 +9,12 @@
                 <p style="display: flex;justify-content: center;font-size: 18px;">{{devaluatedAmount}}</p>
             </diV>
         </div>
-        <p class="card-text center mt-4" style="font-size: 17px;
-        font-weight: 500;">Start time: {{startTime}}</p>
-        <p class="card-text center" style="font-size: 17px;
-        font-weight: 500;">Stop time: {{stopTime}}</p>
-        <button *ngIf="!stopTimeReached" mat-fab class="center mt-3 rotate" color="primary" (click)="withdraw()"
-            matTooltip="Withdraw amount to logged in account">
+        <p class="card-text center mt-4" style="font-size: 20px;font-weight: 500;">Start time:</p>
+        <p class="card-text center" style="font-size: 17px;font-weight: 500;">{{startTime}}</p>
+        <p class="card-text center mt-4" style="font-size: 20px;font-weight: 500;">Stop time:</p>
+        <p class="card-text center" style="font-size: 17px;font-weight: 500;">{{stopTime}}</p>
+        <button [disabled]="isWbtnDisabled" *ngIf="!stopTimeReached" mat-fab class="center mt-3 rotate" color="primary"
+            (click)="withdraw()" matTooltip="Withdraw amount to logged in account">
             <mat-icon>exit_to_app</mat-icon>
         </button>
         <p *ngIf="stopTimeReached" class="card-text center" style="font-size: 17px;

@@ -19,10 +19,16 @@
   top: -2px;
 }
 
+.footer {  
+  font-size: 17px;
+  background-color: #d9ddeb;
+  padding: 25px;
+}
+
 .insta-icon {
-  width: 20px;
-  position: relative;
-  top: 5px;
+    width: 20px;
+    position: relative;
+    top: 5px;
 }
 
 .start-app {
@@ -54,12 +60,6 @@
   border: 1px solid rgb(192, 192, 192);
   padding: 12px;
   margin-top: 14px;
-}
-
-.footer {
-  font-size: 17px;
-  background-color: #d9ddeb;
-  padding: 25px;
 }
 
 .form-details {
@@ -106,4 +106,9 @@
 ::ng-deep .mat-tab-group.mat-primary .mat-ink-bar, .mat-tab-nav-bar.mat-primary .mat-ink-bar {
   background: rgb(0, 140, 255);
   height: 3px;
+}
+
+::ng-deep .mat-tab-header {
+  display: table !important;
+  margin: 0 auto !important;
 }

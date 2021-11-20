@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, DoCheck, ElementRef, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { DPool } from './DPool';
 import * as moment from 'moment';
 import { DpoolService } from './dpool.service';
@@ -6,8 +6,6 @@ import { HttpClient } from '@angular/common/http';
 import { CapResponse } from './external-api/CapResponse';
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
-import { NavigationEnd, Router } from '@angular/router';
-import { filter } from 'rxjs/operators'
 
 declare let window: any;
 declare let ethers: any;
@@ -61,17 +59,7 @@ export class AppComponent implements OnInit {
 
   constructor(private cdr: ChangeDetectorRef,
     private httpClient: HttpClient,
-    public dPoolService: DpoolService,
-    private router: Router) {
-    this.router.events
-      .pipe(filter((rs): rs is NavigationEnd => rs instanceof NavigationEnd))
-      .subscribe(event => {
-        if (event.id === 1 && event.url === event.urlAfterRedirects) {
-          if (window.ethereum.selectedAddress) {
-            this.startApp();
-          }
-        }
-      });
+    public dPoolService: DpoolService) {
   }
 
   ngOnInit(): void {
@@ -127,7 +115,10 @@ export class AppComponent implements OnInit {
     let startSeconds;
     let stopSeconds;
 
-    if (this.isFormInvalid()) {
+    if (this.dPoolName.length > 10) {
+      this.showErrormsg('Max 10 symbols for name!');
+      return;
+    } else if (this.isFormInvalid()) {
       this.showErrormsg('Every field is required and at least one recipient address must be added!');
       return;
     } else {
@@ -135,7 +126,7 @@ export class AppComponent implements OnInit {
         .minute(moment().minute()).add(1, 'minutes')
         .toDate().getTime() / 1000);
       stopSeconds = Math.ceil(this.endDate.hour(moment().hour())
-        .minute(moment().minute())
+        .minute(moment().minute()).add(1, 'minutes')
         .toDate().getTime() / 1000);
 
       if (this.isTimeRangeInvalid(startSeconds, stopSeconds)) {
@@ -163,9 +154,10 @@ export class AppComponent implements OnInit {
 
     this.dPoolService.createDPoolOnChain(newDPool)
       .then(response => {
-        console.log(response);
         if (response) {
           newDPool.dPoolId = "0";
+          newDPool.startTime = newDPool.startTime * 1000;
+          newDPool.stopTime = newDPool.stopTime * 1000;
           this.dPools.push(newDPool);
         }
       })
@@ -211,6 +203,11 @@ export class AppComponent implements OnInit {
 
   closeForm() {
     this.clearForm();
+  }
+
+  closeForm2() {
+    this.clearForm();
+    this.form.nativeElement.style = 'display: none';
   }
 
   clearForm() {

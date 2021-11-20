@@ -2,7 +2,6 @@ import { Component, Input, OnInit } from '@angular/core';
 import { DPool } from '../DPool';
 import * as moment from 'moment';
 import { DpoolService } from '../dpool.service';
-import { HttpClient } from '@angular/common/http';
 
 declare let document: any;
 
@@ -15,6 +14,7 @@ export class DpoolComponent implements OnInit {
 
   jdValue = '';
   valueType = 'ETH';
+  boxes: number;
 
   @Input() dPool: DPool;
 
@@ -28,6 +28,7 @@ export class DpoolComponent implements OnInit {
     }
 
     this.jdValue = this.dPool.dPoolId;
+    this.boxes = Math.floor(Math.random() * 13 + 1);
   }
 
   // TODO
@@ -36,11 +37,11 @@ export class DpoolComponent implements OnInit {
   }
 
   get startTime() {
-    return (moment(new Date(this.dPool.startTime))).format('DD.MM.yyyy hh:mm:ss');
+    return (moment(new Date(this.dPool.startTime))).format('DD.MM.yyyy hh:mm:ss A');
   }
 
   get stopTime() {
-    return (moment(new Date(this.dPool.stopTime))).format('DD.MM.yyyy hh:mm:ss');
+    return (moment(new Date(this.dPool.stopTime))).format('DD.MM.yyyy hh:mm:ss A');
   }
 
   devaluate(num) {
@@ -50,7 +51,9 @@ export class DpoolComponent implements OnInit {
     }).format(num);
   }
 
-
+  counter(i: number) {
+    return new Array(i);
+  }
 
   arrow(poolId) {
     document.getElementById(poolId).click();
