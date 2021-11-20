@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, DoCheck, ElementRef, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { DPool } from './DPool';
 import * as moment from 'moment';
 import { DpoolService } from './dpool.service';
@@ -6,6 +6,8 @@ import { HttpClient } from '@angular/common/http';
 import { CapResponse } from './external-api/CapResponse';
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
+import { NavigationEnd, Router } from '@angular/router';
+import { filter } from 'rxjs/operators'
 
 declare let window: any;
 declare let ethers: any;
@@ -59,8 +61,17 @@ export class AppComponent implements OnInit {
 
   constructor(private cdr: ChangeDetectorRef,
     private httpClient: HttpClient,
-    public dPoolService: DpoolService) {
-
+    public dPoolService: DpoolService,
+    private router: Router) {
+    this.router.events
+      .pipe(filter((rs): rs is NavigationEnd => rs instanceof NavigationEnd))
+      .subscribe(event => {
+        if (event.id === 1 && event.url === event.urlAfterRedirects) {
+          if (window.ethereum.selectedAddress) {
+            this.startApp();
+          }
+        }
+      });
   }
 
   ngOnInit(): void {
