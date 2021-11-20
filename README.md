@@ -58,7 +58,7 @@ youtube
      yeah I had to develop on windows :/
      <br/>
 
-   **Thats it.**
+     **Thats it.**
 
   - For contract Unit tests:<br/>
     `npm run test`
