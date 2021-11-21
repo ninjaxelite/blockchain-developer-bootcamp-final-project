@@ -31,7 +31,7 @@ Make sure MetaMask is running on local network port 7545.<br/>
 ![p2](https://user-images.githubusercontent.com/8811485/142629735-a346c7ca-fa13-4992-8987-62e524c36b52.jpg)
 
 4. You can follow the next steps in my screencast here:
-youtube
+https://youtu.be/Zr3xqOJ63D8
 
 ------------
 
