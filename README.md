@@ -47,7 +47,8 @@ youtube
     `cd blockchain-developer-bootcamp-final-project`
 
   - Run Ganache on port 7545 and import at least two wallets to MetaMask:<br/>
-    `ganache-cli -p 7545`
+    `ganache-cli -p 7545 -i 5777`<br/>
+    Note: You can find the network id '5777' in the DecentralizedPools.json under `networks.5777`.
 
   - Build and deploy locally and move the compiled *json* file to frontend-ng:<br/>
     `npm run deploy`
