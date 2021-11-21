@@ -21,7 +21,7 @@ If a participant wants to withdraw its fair share, simply call the following fun
 
 ------------
 ### Visual testing
-1. Access website on https://dpools.subdomain.com
+1. Access website on https://dpools.000webhostapp.com/
 *Contract is deployed on Rinkeby 0x...*
 2. Login to MetaMask and press the button *Start Applikation*.
 Make sure MetaMask is running on local network port 7545.<br/>
