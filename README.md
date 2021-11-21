@@ -77,7 +77,8 @@ Note: You need to have a freshly spun up blockchain because the unit tests chang
     `npm install --save`
 
   - And spin up frontend:<br/>
-    `ng serve --open`
+    `ng serve --open`<br/>
+    Note: Frontend pics the first network id from DecentralizedPools.json.
 
 ------------
 ### Things to improve
