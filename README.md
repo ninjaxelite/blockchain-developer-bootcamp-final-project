@@ -15,7 +15,7 @@ To create a new DPool containing Ether call the contract function:<br/>
         uint256 stopTime
     )`
 <br/>
-If a participant wants to withdraw its fair share, simply call following function with recipient address:<br/>
+If a participant wants to withdraw its fair share, simply call the following function with recipient address:<br/>
 `withdrawFromDPool( uint256 dpId, uint256 amount )`
 
 ------------
