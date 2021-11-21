@@ -32,10 +32,12 @@ export class ReceptorComponent implements OnInit {
       .balanceOf(this.dPool.dPoolId, selectedAccount);
     receptorBalance = this.dPoolService.getEthInWei(receptorBalance).toString();
     if (receptorBalance > 0) {
-      await this.dPoolService.withdrawFromDPool(this.dPool.dPoolId, receptorBalance);
+      await this.dPoolService.withdrawFromDPool(this.dPool.dPoolId, receptorBalance)
+        .finally(() => {
+          this.dPool.receptorBalanceInETH = 0;
+          this.isWbtnDisabled = true;
+        });
     }
-    this.dPool.receptorBalanceInETH = 0;
-    this.isWbtnDisabled = true;
   }
 
   get stopTimeReached(): boolean {

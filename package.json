@@ -8,7 +8,7 @@
         "test": "truffle test --network development",
         "build": "truffle build && copy build\\contracts\\DecentralizedPools.json frontend-ng\\src\\contract",
         "deploy": "truffle migrate --reset --network development && copy build\\contracts\\DecentralizedPools.json frontend-ng\\src\\contract",
-        "deploy-rinkeby": "truffle migrate --network rinkeby",
+        "deploy-rinkeby": "truffle migrate --reset --network rinkeby",
         "start-debugger": "truffle run debug start"
     },
     "author": "Magomed Arsaev",

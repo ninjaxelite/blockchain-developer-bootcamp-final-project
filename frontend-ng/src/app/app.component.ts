@@ -103,12 +103,16 @@ export class AppComponent implements OnInit {
 
   public async getDPools() {
     const myDPools: DPool[] = await this.dPoolService.getDPools(this.selectedAccount, this.currentEthPrice);
-    myDPools.forEach(dp => this.dPools.push(dp));
+    if (myDPools) {
+      myDPools.forEach(dp => this.dPools.push(dp));
+    }
   }
 
   public async getReceiverDPools() {
     const myDPools: DPool[] = await this.dPoolService.getRecipientDPools(this.selectedAccount, this.currentEthPrice);
-    myDPools.forEach(dp => this.recipientDPools.push(dp));
+    if (myDPools) {
+      myDPools.forEach(dp => this.recipientDPools.push(dp));
+    }
   }
 
   public async createDPool() {

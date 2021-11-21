@@ -1,1 +1,1 @@
-Ropston network address: 
+Rinkeby network address: 0x6CbB8a5C0033f90d948Bf5323338172920579eF6

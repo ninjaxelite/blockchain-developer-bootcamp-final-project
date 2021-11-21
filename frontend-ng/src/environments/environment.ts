@@ -6,13 +6,16 @@ import dPools from '../contract/DecentralizedPools.json';
 
 export const environment = {
   production: false,
-  dPoolContract: dPools.networks[getNetworkId()].address
+  dPoolContract: getNetworkId()
 };
 
 function getNetworkId() {
   for (var propName in dPools.networks) {
     if (dPools.networks.hasOwnProperty(propName)) {
-      return propName;
+      const address = dPools.networks[propName].address;
+      console.log("Using network id: " + propName);
+      console.log("Connected to contract address: " + address);
+      return address;
     }
   }
 }
