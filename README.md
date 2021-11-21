@@ -45,7 +45,7 @@ youtube
   - Go to the main folder '*blockchain-developer-bootcamp-final-project*:'<br/>
     `cd blockchain-developer-bootcamp-final-project`
 
-  - Run Ganache on port 7545:<br/>
+  - Run Ganache on port 7545 and import at least two wallets to MetaMask:<br/>
     `ganache-cli -p 7545`
 
   - Build and deploy locally and move the compiled *json* file to frontend-ng:<br/>
