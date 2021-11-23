@@ -41,7 +41,8 @@ export class ReceptorComponent implements OnInit {
   }
 
   get stopTimeReached(): boolean {
-    return this.dPool.stopTime < (new Date().getTime()) ? true : false;
+    return this.dPool.stopTime < (new Date().getTime())
+      && this.dPool.receptorBalanceInETH === 0 ? true : false;
   }
 
   get balance() {
