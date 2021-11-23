@@ -22,7 +22,7 @@ If a participant wants to withdraw its fair share, simply call the following fun
 ------------
 ### Visual testing
 1. Access website on https://dpools.000webhostapp.com/ <br/>
-*Contract is deployed on Rinkeby 0x...*
+*Contract is deployed on Rinkeby `0x6CbB8a5C0033f90d948Bf5323338172920579eF6`*
 2. Login to MetaMask and press the button *Start Applikation*.
 Make sure MetaMask is running on local network port 7545.<br/>
 ![p1](https://user-images.githubusercontent.com/8811485/142629714-453582d5-834a-44f8-b025-c0b6feed6e31.jpg)
