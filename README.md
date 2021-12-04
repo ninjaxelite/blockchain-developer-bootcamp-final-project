@@ -40,6 +40,7 @@ https://youtu.be/Zr3xqOJ63D8
  - Node: 12.18.2
  - Package Manager: npm 6.8.0
  - Ganache CLI v6.12.2 (ganache-core: 2.13.2)
+ - Truffle v5.4.6
 
 ### Setup
 - #### Ganache
