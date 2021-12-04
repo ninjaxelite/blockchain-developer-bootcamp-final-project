@@ -55,10 +55,9 @@ https://youtu.be/Zr3xqOJ63D8
     `npm run deploy`
 
     --  If that does not work, you have to build and move json file on your own:<br/>
-     --- `truffle migrate --reset`  
+     --- `truffle migrate --reset --network development`  
      and           
-     --- `copy build\\contracts\\DecentralizedPools.json frontend-ng\\src\\contract` <br/>
-     yeah I had to develop on windows :/
+     --- `cp build/contracts/DecentralizedPools.json frontend-ng/src/contract` <br/>
      <br/>
 
      **Thats it.**
