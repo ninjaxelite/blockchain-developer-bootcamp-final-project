@@ -24,7 +24,7 @@
     "@angular/platform-browser-dynamic": "~12.2.12",
     "@angular/router": "~12.2.12",
     "jdenticon": "^3.1.1",
-    "moment": "^2.29.1",
+    "moment": "^2.29.4",
     "ngx-jdenticon": "^1.0.4",
     "rxjs": "~7.4.0",
     "tslib": "^2.0.0",
